@@ -32,6 +32,7 @@
               class="popup-form_btns_save"
               variant="primary"
               size="sm"
+              :disabled="!name"
               @click="onSaveHandler"
             >
                 SAVE FILTER
@@ -50,16 +51,22 @@
             SAVE AS NEW FILTER
         </b-dropdown-item-button>
     </b-dropdown-form>
-
 </b-dropdown>
 </template>
 
 <script>
+import EventBus from '@/eventBus';
+import BaseWarningModal from "./BaseWarningModal.vue";
+
 export default {
     props: ['enabled', 'filterName', 'processing', 'onSave', 'onSaveAs'],
+    components: {
+        BaseWarningModal
+    },
     data() {
         return {
             name: this.filterName || '',
+            SAVE_MODAL_ID: 'filterModalSaveWarning',
         };
     },
     methods: {
@@ -68,6 +75,10 @@ export default {
             this.onSave(this.filterName);
         },
         onSaveHandler() {
+            if (!this.name) {
+                EventBus.$emit('SAVE_FILTER');
+                return;
+            }
             this.$refs.dropdown.hide();
             this.onSave(this.name);
         },
