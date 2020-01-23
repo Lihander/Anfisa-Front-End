@@ -62,7 +62,7 @@
   import AnfisaInfo from "~/components/system/header/AnfisaInfo.vue"
   import BaseModal from "~/components/UI/Modals/BaseModal.vue"
   import AppButton from "~/components/UI/Controls/Button.vue"
-  import DefaultList from "~/components/UI/lists/DefaultList.vue"
+  import DefaultList from "~/components/UI/Lists/DefaultList.vue"
   import WorkspaceInfo from "~/components/system/header/WorkspaceInfo.vue";
 
   export default {
