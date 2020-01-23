@@ -1,4 +1,4 @@
-import * as utils from '../assets/js/utils.js'
+import * as utils from "../assets/js/utils.js"
 
 export const state = () => ({
   workspaces: [],
@@ -49,8 +49,19 @@ export const mutations = {
 }
 
 export const actions = {
-  nuxtServerInit({ commit }) {
-    return this.$axios
+  // This worked only with universal mode
+  // nuxtServerInit({ commit }) {
+  //   return this.$axios
+  //     .$get("/dirinfo")
+  //     .then(res => {
+  //       commit("setWorkspaces", res.workspaces)
+  //       commit("setVersion", res.version)
+  //     })
+  //     .catch(e => console.log(e))
+  // },
+
+  async getWorkspacesList({ commit }) {
+    await this.$axios
       .$get("/dirinfo")
       .then(res => {
         commit("setWorkspaces", res.workspaces)
@@ -58,39 +69,44 @@ export const actions = {
       })
       .catch(e => console.log(e))
   },
-  async getWorkspaceDetails ({ commit }, selectedWorkspace) {
-    commit('setSelectedWorkspace', selectedWorkspace)
-    commit('resetWorkspace')
-    const params = new URLSearchParams();
-    params.append('ws', selectedWorkspace)
-    await this.$axios.$post('/list', params)
-      .then((res) => {
-        commit('setVariants', res.records.map(record => {
-          return {
-            id: record[0],
-            name: record[1],
-            type: record[2]
-          }
-        }));
-        commit('setTotalVariants', res.total);
-        commit('setFilteredVariants', res.filtered);
-        commit('setTranscripts', res.transcripts);
+  async getWorkspaceDetails({ commit }, selectedWorkspace) {
+    commit("setSelectedWorkspace", selectedWorkspace)
+    commit("resetWorkspace")
+    const params = new URLSearchParams()
+    params.append("ws", selectedWorkspace)
+    await this.$axios
+      .$post("/list", params)
+      .then(res => {
+        commit(
+          "setVariants",
+          res.records.map(record => {
+            return {
+              id: record[0],
+              name: record[1],
+              type: record[2]
+            }
+          })
+        )
+        commit("setTotalVariants", res.total)
+        commit("setFilteredVariants", res.filtered)
+        commit("setTranscripts", res.transcripts)
       })
       .catch(e => console.log(e))
   },
-  async getVariantDetails({commit}, selectedVariantId) {
-    commit('setSelectedVariantId', selectedVariantId)
-    const params = new URLSearchParams();
-    params.append('ds', this.getters.getSelectedWorkspace);
-    params.append('rec', selectedVariantId);
-    await this.$axios.$post('/reccnt', params)
-      .then((response) => {
-        const result = utils.prepareVariantDetails(response.data);
-        commit('setSelectedVariantDetails', result);
+  async getVariantDetails({ commit }, selectedVariantId) {
+    commit("setSelectedVariantId", selectedVariantId)
+    const params = new URLSearchParams()
+    params.append("ds", this.getters.getSelectedWorkspace)
+    params.append("rec", selectedVariantId)
+    await this.$axios
+      .$post("/reccnt", params)
+      .then(response => {
+        const result = utils.prepareVariantDetails(response.data)
+        commit("setSelectedVariantDetails", result)
       })
-      .catch((error) => {
-        commit('setSelectedVariantDetails', null);
-        console.log(error);
+      .catch(error => {
+        commit("setSelectedVariantDetails", null)
+        console.log(error)
       })
   }
 }

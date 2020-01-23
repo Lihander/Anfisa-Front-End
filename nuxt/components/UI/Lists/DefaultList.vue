@@ -1,7 +1,12 @@
 <template>
   <v-list>
     <v-list-item-group color="primary">
-      <v-list-item v-for="(item, i) in items" :key="i" @dblclick="$emit('dblclick', item)" @click="$emit('click', item)">
+      <v-list-item
+        v-for="(item, i) in items"
+        :key="i"
+        @dblclick="$emit('dblclick', item)"
+        @click="$emit('click', item)"
+      >
         <v-list-item-content>
           {{ item }}
         </v-list-item-content>
@@ -23,7 +28,7 @@ export default {
 </script>
 
 <style lang="scss">
-  .v-list {
-    padding: 0;
-  }
+.v-list {
+  padding: 0;
+}
 </style>

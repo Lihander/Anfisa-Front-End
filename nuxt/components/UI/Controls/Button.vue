@@ -9,7 +9,10 @@ export default {
   name: "Button",
   props: {
     btnClass: {
-      type: String
+      type: String,
+      default: () => {
+        return "btnDefault"
+      }
     }
   }
 }

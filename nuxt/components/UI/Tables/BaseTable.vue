@@ -1,13 +1,9 @@
-<template>
-    
-</template>
+<template> </template>
 
 <script>
-    export default {
-        name: "BaseTable"
-    }
+export default {
+  name: "BaseTable"
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

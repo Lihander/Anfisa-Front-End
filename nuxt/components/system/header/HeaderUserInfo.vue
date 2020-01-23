@@ -2,7 +2,9 @@
   <div class="user-info">
     <div class="report">
       <span>Report</span>
-      <AppButton class="btnPrimary">EXPORT</AppButton>
+      <AppButton class="btnPrimary">
+        EXPORT
+      </AppButton>
     </div>
     <div class="user-info-name">
       <AppButton class="btnDefaultOutline">

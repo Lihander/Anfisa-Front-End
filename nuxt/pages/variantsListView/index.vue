@@ -5,13 +5,11 @@
 </template>
 
 <script>
-    import VariantsListView from "../../components/view/list/VariantsListView";
-    export default {
-        name: "index",
-      components: {VariantsListView}
-    }
+import VariantsListView from "../../components/view/list/VariantsListView"
+export default {
+  name: "Index",
+  components: { VariantsListView }
+}
 </script>
 
-<style lang="scss">
-
-</style>
+<style lang="scss"></style>

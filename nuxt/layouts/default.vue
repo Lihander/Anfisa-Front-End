@@ -8,17 +8,21 @@
 </template>
 
 <script>
-  import Header from "~/components/system/header/Header.vue"
-  export default {
-    components: {Header}
+import Header from "~/components/system/header/Header.vue"
+export default {
+  components: { Header },
+  created() {
+    this.$store.dispatch("getWorkspacesList")
   }
+}
 </script>
 
 <style lang="scss">
-  .home {
-    height: 100vh;
-    background: linear-gradient( $border-light, transparent 1px), linear-gradient( 90deg, $border-light, transparent 1px);
-    background-size: 10px 10px;
-    background-position: center center;
-  }
+.home {
+  height: 100vh;
+  background: linear-gradient($border-light, transparent 1px),
+    linear-gradient(90deg, $border-light, transparent 1px);
+  background-size: 10px 10px;
+  background-position: center center;
+}
 </style>
