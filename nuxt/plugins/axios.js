@@ -1,6 +1,8 @@
 export default function({ $axios, redirect }) {
   $axios.onRequest(config => {
-    config.headers.common["Authorization"] = process.env.BASIC_AUTH
+    if (process.env.NODE_ENV !== "production") {
+      config.headers.common["Authorization"] = process.env.BASIC_AUTH
+    }
   })
 
   $axios.onError(error => {
