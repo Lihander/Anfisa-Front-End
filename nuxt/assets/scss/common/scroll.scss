@@ -1,5 +1,6 @@
 .default-scroll {
-  overflow-y:scroll;
+  overflow-x:auto;
+  overflow-y:auto;
   &::-webkit-scrollbar {
     width: 10px;
   }

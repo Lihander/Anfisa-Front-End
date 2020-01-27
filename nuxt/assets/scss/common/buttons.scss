@@ -51,6 +51,15 @@
     }
   }
 
+  &.btnWithoutBorder {
+    color: $default-color;
+    background-color: rgba(0, 0, 0, 0);
+    &:hover, :focus {
+      color: $neutral-placeholder;
+      background-color: rgba(0, 0, 0, 0);
+    }
+  }
+
   &.btnCancel {
     color: $secondary-color;
     border: 1px solid $neutral-placeholder;

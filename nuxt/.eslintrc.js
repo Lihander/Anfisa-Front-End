@@ -21,6 +21,7 @@ module.exports = {
     'vue/max-attributes-per-line': 'off',
     'prettier/prettier': ['error', { 'semi': false }],
     "vue/html-self-closing": 'off',
-    "no-unused-vars": 'off'
+    "no-unused-vars": 'off',
+    "vue/no-v-html": 'off'
   }
 }

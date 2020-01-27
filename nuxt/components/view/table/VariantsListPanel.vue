@@ -26,7 +26,7 @@ export default {
   components: { DefaultSwitcher, VariantsItem },
   data() {
     return {
-      selectedVariant: null,
+      selectedVariantId: null,
       switchItems: [
         {
           name: "GENE",
@@ -45,7 +45,7 @@ export default {
     },
     getSelectedVariantClass() {
       return item => {
-        return this.selectedVariant === item.id
+        return this.selectedVariantId === item.id
           ? "variants-list__item__active"
           : ""
       }
@@ -58,9 +58,13 @@ export default {
       })
     },
     getVariantsDetails(item) {
-      if (this.selectedVariant !== item.id) {
-        this.selectedVariant = item.id
-        this.$store.dispatch("getVariantDetails", item.id)
+      if (this.selectedVariantId !== item.id) {
+        this.selectedVariantId = item.id
+        if (item.details === null) {
+          this.$store.dispatch("getVariantDetails", item.id)
+        } else {
+          this.$store.commit("setSelectedVariantId", item.id)
+        }
       }
     }
   }

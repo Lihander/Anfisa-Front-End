@@ -8,8 +8,7 @@ export const state = () => ({
   totalVariants: 0,
   filteredVariants: 0,
   transcripts: [],
-  selectedVariantId: "",
-  selectedVariantDetails: null
+  selectedVariantId: ""
 })
 
 export const mutations = {
@@ -37,8 +36,22 @@ export const mutations = {
   setSelectedVariantId(state, selectedVariantId) {
     state.selectedVariantId = selectedVariantId
   },
-  setSelectedVariantDetails(state, selectedVariantDetails) {
-    state.selectedVariantDetails = selectedVariantDetails
+  setVariantDetailsById(state, payload) {
+    const variant = state.variants.find(v => v.id === payload.selectedVariantId)
+    variant.details = payload.details
+  },
+  setVariantCollapseDetailsById(state, payload) {
+    const variant = state.variants.find(v => v.id === payload.selectedVariantId)
+    if (variant && variant.details.length > 0) {
+      for (let tableName in variant.details) {
+        variant.details[tableName].collapseTable = false
+      }
+    }
+  },
+  setVariantCollapseDetailsByIdAndTableName(state, payload) {
+    const variant = state.variants.find(v => v.id === payload.selectedVariantId)
+    const detail = variant.details[payload.tableName]
+    detail.collapseTable = !detail.collapseTable
   },
   resetWorkspace(state) {
     state.variants = []
@@ -83,7 +96,8 @@ export const actions = {
             return {
               id: record[0],
               name: record[1],
-              type: record[2]
+              type: record[2],
+              details: null
             }
           })
         )
@@ -94,18 +108,17 @@ export const actions = {
       .catch(e => console.log(e))
   },
   async getVariantDetails({ commit }, selectedVariantId) {
-    commit("setSelectedVariantId", selectedVariantId)
     const params = new URLSearchParams()
     params.append("ds", this.getters.getSelectedWorkspace)
     params.append("rec", selectedVariantId)
     await this.$axios
       .$post("/reccnt", params)
       .then(response => {
-        const result = utils.prepareVariantDetails(response.data)
-        commit("setSelectedVariantDetails", result)
+        const details = utils.prepareVariantDetails(response)
+        commit("setVariantDetailsById", { selectedVariantId, details })
+        commit("setSelectedVariantId", selectedVariantId)
       })
       .catch(error => {
-        commit("setSelectedVariantDetails", null)
         console.log(error)
       })
   }
@@ -136,7 +149,7 @@ export const getters = {
   getSelectedVariantId(state) {
     return state.selectedVariantId
   },
-  getSelectedVariantDetails(state) {
-    return state.selectedVariantDetails
+  getVariantById: state => id => {
+    return state.variants.find(variant => variant.id === id)
   }
 }

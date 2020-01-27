@@ -6,7 +6,7 @@
         :is-variants-list-show="isVariantsListShow"
         @showVariantsList="isVariantsListShow = !isVariantsListShow"
       />
-      <VariantsTables />
+      <VariantsTables v-if="isVariantSelected" />
     </div>
   </section>
 </template>
@@ -22,9 +22,14 @@ export default {
       isVariantsListShow: true
     }
   },
-  validate({ params, query, store }) {
-    return store.getters.getWorkspaces.some(ws => ws.name === query.ws)
+  computed: {
+    isVariantSelected() {
+      return this.$store.getters.getSelectedVariantId !== ""
+    }
   },
+  // validate({ params, query, store }) {
+  //   return store.getters.getWorkspaces.some(ws => ws.name === query.ws)
+  // },
   watch: {
     "$route.query.ws"() {
       this.getWorkspaceDetails()

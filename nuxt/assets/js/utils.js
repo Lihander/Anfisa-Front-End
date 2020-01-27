@@ -6,14 +6,16 @@ export function prepareVariantDetails(data) {
     if (item.type === "table") {
       const tableData = item.rows.map(row => [
         {
-          data: row[1],
-          title: row[3]
-        },
-        ...getValuesForRow(row[2])
+          name: row[0],
+          title: row[1],
+          description: row[3],
+          data: getValuesForRow(row[2])
+        }
       ])
       result[item.name] = {
         title: item.title,
         data: tableData,
+        collapseTable: false,
         ...(item.colhead ? { colhead: item.colhead } : {})
       }
     } else if (item.type === "pre") {
