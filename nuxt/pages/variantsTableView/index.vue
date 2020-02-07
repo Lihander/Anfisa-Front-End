@@ -39,7 +39,7 @@
 <script>
 import VariantsListPanel from "~/components/view/table/VariantsListPanel.vue"
 import VariantsTables from "~/components/view/table/VariantsTables.vue"
-import ViewToolbar from "~/components/UI/toolbar/ViewToolbar.vue"
+import ViewToolbar from "~/components/UI/Toolbar/ViewToolbar.vue"
 import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
 import AppButton from "~/components/UI/Controls/Button.vue"
 export default {

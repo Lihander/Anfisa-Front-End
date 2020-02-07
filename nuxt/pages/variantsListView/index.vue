@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import ViewToolbar from "~/components/UI/toolbar/ViewToolbar.vue"
-import VariantsListView from "../../components/view/list/VariantsListView"
+import ViewToolbar from "~/components/UI/Toolbar/ViewToolbar.vue"
+import VariantsListView from "~/components/view/list/VariantsListView"
 import AppButton from "~/components/UI/Controls/Button.vue"
 export default {
   name: "Index",

@@ -1,7 +1,7 @@
 <template>
   <div class="sample-item">
     <div class="genotype">
-      {{data}}
+      {{ data }}
     </div>
   </div>
 </template>
@@ -15,8 +15,7 @@ export default {
       required: true
     }
   },
-  computed: {
-  }
+  computed: {}
 }
 </script>
 
