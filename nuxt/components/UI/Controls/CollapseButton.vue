@@ -1,15 +1,21 @@
 <template>
-  <AppButton btn-class="btnWithoutBorder" @click="$emit('change')">
+  <AppButton :btn-class="btnClass" @click="$emit('change')">
     <font-awesome-icon :icon="getCollapseButtonIcon" />
   </AppButton>
 </template>
 
 <script>
-import AppButton from "~/components/UI/Controls/Button"
+import AppButton from "~/components/UI/Controls/Button.vue"
 export default {
   name: "CollapseButton",
   components: { AppButton },
   props: {
+    btnClass: {
+      type: String,
+      default: () => {
+        return "btnDefault"
+      }
+    },
     value: {
       type: Boolean,
       required: true

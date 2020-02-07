@@ -1,11 +1,36 @@
 <template>
   <section class="wrapper-content wrapper-content--fixed">
-    <div class="variants-desktop">
+    <div class="table-view-desktop">
       <VariantsListPanel v-show="isVariantsListShow" />
-      <ButtonsList
-        :is-variants-list-show="isVariantsListShow"
-        @showVariantsList="isVariantsListShow = !isVariantsListShow"
-      />
+      <div class="view-toolbar-wrapper">
+        <ViewToolbar>
+          <CollapseButton
+            slot="top-btns"
+            class="buttons-list__button"
+            btn-class="btnSecondary"
+            :value="isVariantsListShow"
+            :show-icon="showVariantsListButtonIcon"
+            :hide-icon="hideVariantsListButtonIcon"
+            @change="isVariantsListShow = !isVariantsListShow"
+          />
+          <div slot="btns" class="bottom-btns">
+            <AppButton
+              v-if="isVariantSelected"
+              class="buttons-list__button"
+              btn-class="btnDefault"
+            >
+              <font-awesome-icon :icon="['fas', 'clipboard']" />
+            </AppButton>
+            <AppButton
+              v-if="isVariantSelected"
+              class="buttons-list__button"
+              btn-class="btnDefault"
+            >
+              <font-awesome-icon :icon="['fas', 'tags']" />
+            </AppButton>
+          </div>
+        </ViewToolbar>
+      </div>
       <VariantsTables v-if="isVariantSelected" />
     </div>
   </section>
@@ -13,45 +38,41 @@
 
 <script>
 import VariantsListPanel from "~/components/view/table/VariantsListPanel.vue"
-import ButtonsList from "~/components/UI/Lists/ButtonsList.vue"
-import VariantsTables from "~/components/view/table/VariantsTables"
+import VariantsTables from "~/components/view/table/VariantsTables.vue"
+import ViewToolbar from "~/components/UI/toolbar/ViewToolbar.vue"
+import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
+import AppButton from "~/components/UI/Controls/Button.vue"
 export default {
-  components: { VariantsTables, ButtonsList, VariantsListPanel },
+  components: {
+    ViewToolbar,
+    VariantsTables,
+    VariantsListPanel,
+    CollapseButton,
+    AppButton
+  },
   data() {
     return {
-      isVariantsListShow: true
+      isVariantsListShow: true,
+      hideVariantsListButtonIcon: ["fas", "arrow-circle-left"],
+      showVariantsListButtonIcon: ["fas", "arrow-circle-right"]
     }
   },
   computed: {
     isVariantSelected() {
       return this.$store.getters.getSelectedVariantId !== ""
     }
-  },
-  // validate({ params, query, store }) {
-  //   return store.getters.getWorkspaces.some(ws => ws.name === query.ws)
-  // },
-  watch: {
-    "$route.query.ws"() {
-      this.getWorkspaceDetails()
-    }
-  },
-  mounted() {
-    this.getWorkspaceDetails()
-  },
-  methods: {
-    getWorkspaceDetails() {
-      const { ws } = this.$route.query
-      this.$store.dispatch("getWorkspaceDetails", ws)
-    }
   }
 }
 </script>
 
 <style lang="scss">
-.variants-desktop {
+.table-view-desktop {
   height: 100%;
   display: flex;
   justify-content: flex-start;
   align-items: flex-start;
+}
+.view-toolbar-wrapper {
+  width: 4%;
 }
 </style>

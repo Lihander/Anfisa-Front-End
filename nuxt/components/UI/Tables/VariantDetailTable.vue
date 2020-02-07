@@ -6,6 +6,7 @@
   >
     <CollapseButton
       slot="btns"
+      :btn-class="'btnWithoutBorder'"
       :value="getCollapseTable"
       :show-icon="collapseShowIcon"
       :hide-icon="collapseHideIcon"
@@ -16,7 +17,7 @@
 
 <script>
 import TableWithHeader from "~/components/UI/Tables/TableWithHeader"
-import CollapseButton from "../Controls/CollapseButton"
+import CollapseButton from "~/components/UI/Controls/CollapseButton"
 
 export default {
   name: "VariantDetailTable",
@@ -48,7 +49,13 @@ export default {
   methods: {
     getSelectedVariantDetailByName(name) {
       const selectedVariant = this.getSelectedVariant
-      return selectedVariant.details[name]
+      if (
+        selectedVariant.details &&
+        Object.prototype.hasOwnProperty.call(selectedVariant.details, name)
+      ) {
+        return selectedVariant.details[name]
+      }
+      return null
     },
     changeCollapseVariantValue() {
       const selectedVariantId = this.getSelectedVariantId

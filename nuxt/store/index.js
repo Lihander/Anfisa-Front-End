@@ -37,15 +37,13 @@ export const mutations = {
     state.selectedVariantId = selectedVariantId
   },
   setVariantDetailsById(state, payload) {
-    const variant = state.variants.find(v => v.id === payload.selectedVariantId)
+    const variant = state.variants.find(v => v.id === payload.variantId)
     variant.details = payload.details
   },
   setVariantCollapseDetailsById(state, payload) {
     const variant = state.variants.find(v => v.id === payload.selectedVariantId)
-    if (variant && variant.details.length > 0) {
-      for (let tableName in variant.details) {
-        variant.details[tableName].collapseTable = false
-      }
+    for (let tableName in variant.details) {
+      variant.details[tableName].collapseTable = payload.collapseTable
     }
   },
   setVariantCollapseDetailsByIdAndTableName(state, payload) {
@@ -107,16 +105,15 @@ export const actions = {
       })
       .catch(e => console.log(e))
   },
-  async getVariantDetails({ commit }, selectedVariantId) {
+  async getVariantDetails({ commit }, variantId) {
     const params = new URLSearchParams()
     params.append("ds", this.getters.getSelectedWorkspace)
-    params.append("rec", selectedVariantId)
+    params.append("rec", variantId)
     await this.$axios
       .$post("/reccnt", params)
       .then(response => {
         const details = utils.prepareVariantDetails(response)
-        commit("setVariantDetailsById", { selectedVariantId, details })
-        commit("setSelectedVariantId", selectedVariantId)
+        commit("setVariantDetailsById", { variantId, details })
       })
       .catch(error => {
         console.log(error)
@@ -151,5 +148,29 @@ export const getters = {
   },
   getVariantById: state => id => {
     return state.variants.find(variant => variant.id === id)
+  },
+  getVariantDetailDataByVariantIdAndName: state => (id, name) => {
+    const variant = state.variants.find(variant => variant.id === id)
+    if (variant) {
+      const details = variant.details
+      if (details) {
+        for (const table in details) {
+          if (Object.prototype.hasOwnProperty.call(details, table)) {
+            const detail = details[table].data
+            if (detail && detail.length > 0) {
+              const data = detail.find(data => {
+                if (data[0] && data[0].name) {
+                  return data[0].name.toLowerCase() === name.toLowerCase()
+                }
+              })
+              if (data) {
+                return data
+              }
+            }
+          }
+        }
+      }
+    }
+    return ""
   }
 }

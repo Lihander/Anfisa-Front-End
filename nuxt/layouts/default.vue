@@ -11,8 +11,28 @@
 import Header from "~/components/system/header/Header.vue"
 export default {
   components: { Header },
+  // validate({ params, query, store }) {
+  //   return store.getters.getWorkspaces.some(ws => ws.name === query.ws)
+  // },
+  watch: {
+    "$route.query.ws"() {
+      this.getWorkspaceDetails()
+    }
+  },
   created() {
     this.$store.dispatch("getWorkspacesList")
+  },
+  mounted() {
+    const variants = this.$store.getters.getVariants
+    if (variants.length === 0) {
+      this.getWorkspaceDetails()
+    }
+  },
+  methods: {
+    getWorkspaceDetails() {
+      const { ws } = this.$route.query
+      this.$store.dispatch("getWorkspaceDetails", ws)
+    }
   }
 }
 </script>
