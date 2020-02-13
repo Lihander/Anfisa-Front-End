@@ -7,7 +7,9 @@
         btn-class="btnDefault"
         :icon="['fas', 'layer-group']"
       >
-        <ViewButtonsList />
+        <div class="view-buttons-list">
+          <ViewButtonsList />
+        </div>
       </ButtonWithSlot>
       <AppButton
         class="buttons-list__button"
@@ -44,8 +46,14 @@ export default {
     width: 100%;
   }
   &__button {
+    position: relative;
     margin-bottom: 5px;
     width: 100%;
   }
+}
+.view-buttons-list {
+  position: absolute;
+  top: -5px;
+  right: -70px;
 }
 </style>

@@ -5,13 +5,16 @@ label {
   text-align: center;
 }
 input {
-  padding: 16px 26px;
-  margin-bottom: 30px;
+  padding: 2px 5px;
+  margin-bottom: 5px;
   border-radius: 20px;
 }
 textarea {
-  padding: 30px 27px;
-  border-radius: 14px;
+  padding: 5px;
+  border-radius: 20px;
+  resize: none;
+  font-size: 12px;
+  overflow: auto;
 }
 input, textarea {
   width: 100%;

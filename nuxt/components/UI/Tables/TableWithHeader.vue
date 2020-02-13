@@ -2,7 +2,7 @@
   <div class="table-with-header__wrapper">
     <div class="header__wrapper">
       <div class="header__title">
-        {{ tableData.title }}
+        {{ tableData.title.toUpperCase() }}
       </div>
       <div class="header__buttons-list">
         <div class="header__buttons-list__item">

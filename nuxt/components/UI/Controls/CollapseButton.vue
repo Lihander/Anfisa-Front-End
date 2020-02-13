@@ -1,5 +1,5 @@
 <template>
-  <AppButton :btn-class="btnClass" @click="$emit('change')">
+  <AppButton :btn-class="getCollapseButtonClass" @click="$emit('change')">
     <font-awesome-icon :icon="getCollapseButtonIcon" />
   </AppButton>
 </template>
@@ -14,6 +14,12 @@ export default {
       type: String,
       default: () => {
         return "btnDefault"
+      }
+    },
+    hideClass: {
+      type: String,
+      default: () => {
+        return ""
       }
     },
     value: {
@@ -37,6 +43,13 @@ export default {
         return this.value ? this.hideIcon : this.showIcon
       } else {
         return this.showIcon
+      }
+    },
+    getCollapseButtonClass() {
+      if (this.hideClass) {
+        return this.value ? this.hideClass : this.btnClass
+      } else {
+        return this.btnClass
       }
     }
   }

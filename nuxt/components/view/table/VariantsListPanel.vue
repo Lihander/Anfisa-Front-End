@@ -65,13 +65,15 @@ export default {
     scrollToItem() {
       const panel = this.$el.querySelector(".variants-list__wrapper")
       const item = panel.firstElementChild
-      const selectedVariantPosition =
-        item.offsetHeight * this.getSelectedVariantsId
-      if (
-        panel.offsetHeight + panel.scrollTop < selectedVariantPosition ||
-        panel.scrollTop > selectedVariantPosition
-      ) {
-        panel.scrollTop = selectedVariantPosition - item.offsetHeight * 0.4
+      if (item) {
+        const selectedVariantPosition =
+          item.offsetHeight * this.getSelectedVariantsId
+        if (
+          panel.offsetHeight + panel.scrollTop < selectedVariantPosition ||
+          panel.scrollTop > selectedVariantPosition
+        ) {
+          panel.scrollTop = selectedVariantPosition - item.offsetHeight * 0.4
+        }
       }
     },
     selectedItemChange(selectedItem) {
@@ -83,6 +85,7 @@ export default {
       if (this.getSelectedVariantsId !== item.id) {
         if (item.details === null) {
           this.$store.dispatch("getVariantDetails", item.id)
+          this.$store.dispatch("getVariantTagsAndNote", item.id)
         }
         this.$store.commit("setSelectedVariantId", item.id)
       }

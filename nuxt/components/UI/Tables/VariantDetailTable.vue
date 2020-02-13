@@ -39,8 +39,7 @@ export default {
       return this.$store.getters.getSelectedVariantId
     },
     getSelectedVariant() {
-      const selectedVariantId = this.getSelectedVariantId
-      return this.$store.getters.getVariantById(selectedVariantId)
+      return this.$store.getters.getSelectedVariant
     },
     getCollapseTable() {
       return this.getSelectedVariantDetailByName(this.tableName).collapseTable

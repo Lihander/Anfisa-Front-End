@@ -21,7 +21,7 @@ export default {
   /*
    ** Customize the progress-bar color
    */
-  loading: { color: "#2980b9" },
+  loading: { color: "#27ae60" },
   /*
    ** Global CSS
    */
@@ -59,7 +59,6 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    vendor: ["axios", "vuetify"],
     extend(config, ctx) {
       // // Run ESLint on save
       // if (ctx.isDev && ctx.isClient) {

@@ -11,6 +11,16 @@
         class="variants-list-item__column__html"
         v-html="getData('gtex')"
       ></div>
+      <div v-if="getTags.length > 0" class="variants-list-item__column__tags">
+        <div class="variants-list-item__column__tags__wrapper default-scroll">
+          <TagButton
+            v-for="(tag, index) in getTags"
+            :key="index"
+            class="variants-list-item__column__tags__wrapper__item"
+            :tag="tag"
+          />
+        </div>
+      </div>
     </div>
     <div class="variants-list-item__column" style="width: 12%">
       <div class="variants-list-item__column__data">
@@ -90,9 +100,10 @@
 import PredicateItem from "~/components/view/list/PredicateItem.vue"
 import SampleItem from "~/components/view/list/SampleItem.vue"
 import BaseListItem from "~/components/UI/Lists/BaseListItem.vue"
+import TagButton from "~/components/UI/Controls/TagButton.vue"
 export default {
   name: "VariantsListItem",
-  components: { BaseListItem, PredicateItem, SampleItem },
+  components: { BaseListItem, PredicateItem, SampleItem, TagButton },
   props: {
     variant: {
       type: Object,
@@ -143,6 +154,12 @@ export default {
         }
       }
     },
+    getTags() {
+      if (this.variant) {
+        return this.variant.tags
+      }
+      return []
+    },
     isShowHGMD() {
       const hgmd = this.getData("hgmd")
       return (
@@ -183,7 +200,7 @@ export default {
 
 <style lang="scss">
 .variants-list-item {
-  min-height: 20vh;
+  height: 25vh;
   position: relative;
   display: flex;
   justify-content: space-around;
@@ -196,10 +213,46 @@ export default {
   font-size: 16px;
   &__column {
     text-align: left;
+    height: 100%;
+    &__hgmd {
+      font-size: 14px;
+    }
     &__title {
       font-size: 24px;
+      line-height: 26px;
       font-weight: 800;
       color: $primary-color;
+    }
+    &__tags {
+      width: 100%;
+      height: 60%;
+      margin-top: 5px;
+      padding: 0 0 0 5px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+      border: 1px solid $primary-color;
+      border-radius: 5px;
+      &__wrapper {
+        width: 100%;
+        height: 99%;
+        padding: 2px 2px 2px 0;
+        &__item {
+          width: 100%;
+          height: 20%;
+          margin-right: 0;
+          margin-bottom: 5px;
+          &.tag {
+            margin-right: 0;
+          }
+        }
+      }
+      .default-scroll {
+        &::-webkit-scrollbar {
+          width: 4px;
+        }
+        &::-webkit-scrollbar-thumb {
+          border-radius: 10px;
+        }
+      }
     }
   }
   .more-button {

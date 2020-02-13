@@ -8,7 +8,8 @@ export const state = () => ({
   totalVariants: 0,
   filteredVariants: 0,
   transcripts: [],
-  selectedVariantId: ""
+  selectedVariantId: "",
+  tags: []
 })
 
 export const mutations = {
@@ -50,6 +51,17 @@ export const mutations = {
     const variant = state.variants.find(v => v.id === payload.selectedVariantId)
     const detail = variant.details[payload.tableName]
     detail.collapseTable = !detail.collapseTable
+  },
+  setVariantTags(state, payload) {
+    const variant = state.variants.find(v => v.id === payload.variantId)
+    variant.tags = payload.selectedTags
+  },
+  setVariantNote(state, payload) {
+    const variant = state.variants.find(v => v.id === payload.variantId)
+    variant.note = payload.note
+  },
+  setTags(state, payload) {
+    state.tags = payload.tags
   },
   resetWorkspace(state) {
     state.variants = []
@@ -95,7 +107,9 @@ export const actions = {
               id: record[0],
               name: record[1],
               type: record[2],
-              details: null
+              details: null,
+              tags: [],
+              note: ""
             }
           })
         )
@@ -114,6 +128,73 @@ export const actions = {
       .then(response => {
         const details = utils.prepareVariantDetails(response)
         commit("setVariantDetailsById", { variantId, details })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+  async getVariantTagsAndNote({ commit }, variantId) {
+    const params = new URLSearchParams()
+    const NOTE_TAG = "_note"
+    params.append("ws", this.getters.getSelectedWorkspace)
+    params.append("rec", variantId)
+    await this.$axios
+      .$post("/tags", params)
+      .then(response => {
+        const selectedTags = Object.keys(response["rec-tags"]).filter(
+          item => response["rec-tags"][item] && item !== NOTE_TAG
+        )
+        const note = response["rec-tags"][NOTE_TAG] || ""
+        const tags = [...response["check-tags"], ...response["op-tags"]].filter(
+          item => item !== NOTE_TAG
+        )
+        commit("setVariantTags", { variantId, selectedTags })
+        commit("setVariantNote", { variantId, note })
+        commit("setTags", { variantId, tags })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+
+  async saveVariantTagsAndNote({ commit }, payload) {
+    const variantId = payload.variant.id
+    const tag = payload.tag
+    const params = new URLSearchParams()
+    const NOTE_TAG = "_note"
+    const tagsObject = {}
+
+    if (this.state.note) {
+      tagsObject[NOTE_TAG] = this.state.note.trim()
+    }
+
+    this.state.tags.forEach(item => {
+      tagsObject[item] = false
+    })
+    payload.variant.tags.forEach(item => {
+      tagsObject[item] = true
+    })
+
+    if (tag) {
+      tagsObject[tag] = !tagsObject[tag]
+    }
+
+    params.append("tags", JSON.stringify(tagsObject))
+    params.append("ws", this.getters.getSelectedWorkspace)
+    params.append("rec", variantId)
+    await this.$axios
+      .$post("/tags", params)
+      .then(response => {
+        const selectedTags = Object.keys(response["rec-tags"]).filter(
+          item => response["rec-tags"][item] && item !== NOTE_TAG
+        )
+        const note = response["rec-tags"][NOTE_TAG] || ""
+        const tags = [...response["check-tags"], ...response["op-tags"]].filter(
+          item => item !== NOTE_TAG
+        )
+        commit("setVariantTags", { variantId, selectedTags })
+        commit("setVariantNote", { variantId, note })
+        commit("setTags", { variantId, tags })
       })
       .catch(error => {
         console.log(error)
@@ -146,6 +227,11 @@ export const getters = {
   getSelectedVariantId(state) {
     return state.selectedVariantId
   },
+  getSelectedVariant(state) {
+    return state.variants.find(
+      variant => variant.id === state.selectedVariantId
+    )
+  },
   getVariantById: state => id => {
     return state.variants.find(variant => variant.id === id)
   },
@@ -172,5 +258,22 @@ export const getters = {
       }
     }
     return ""
+  },
+  getVariantTagsById: state => id => {
+    const variant = state.variants.find(variant => variant.id === id)
+    if (variant) {
+      return variant.tags
+    }
+    return []
+  },
+  getVariantNoteById: state => id => {
+    const variant = state.variants.find(variant => variant.id === id)
+    if (variant) {
+      return variant.note
+    }
+    return []
+  },
+  getTags(state) {
+    return state.tags
   }
 }

@@ -1,7 +1,7 @@
 <template>
   <div class="button-with-slot__wrapper">
     <AppButton
-      class="button-focus"
+      class="slot__btn"
       :btn-class="btnClass"
       @click="$emit('change')"
       @focus="slotVisible = true"
@@ -48,19 +48,4 @@ export default {
 </script>
 
 <style lang="scss">
-.button-with-slot__wrapper {
-  position: relative;
-}
-.slot__wrapper {
-  position: absolute;
-  top: -5px;
-  right: -70px;
-}
-.button-focus {
-  &:focus {
-    color: $default-color;
-    background-color: $primary-color;
-    border: 1px solid $default-color;
-  }
-}
 </style>

@@ -14,20 +14,7 @@
             @change="isVariantsListShow = !isVariantsListShow"
           />
           <div slot="btns" class="bottom-btns">
-            <AppButton
-              v-if="isVariantSelected"
-              class="buttons-list__button"
-              btn-class="btnDefault"
-            >
-              <font-awesome-icon :icon="['fas', 'clipboard']" />
-            </AppButton>
-            <AppButton
-              v-if="isVariantSelected"
-              class="buttons-list__button"
-              btn-class="btnDefault"
-            >
-              <font-awesome-icon :icon="['fas', 'tags']" />
-            </AppButton>
+            <NoteView v-if="isVariantSelected" />
           </div>
         </ViewToolbar>
       </div>
@@ -41,14 +28,14 @@ import VariantsListPanel from "~/components/view/table/VariantsListPanel.vue"
 import VariantsTables from "~/components/view/table/VariantsTables.vue"
 import ViewToolbar from "~/components/UI/Toolbar/ViewToolbar.vue"
 import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
-import AppButton from "~/components/UI/Controls/Button.vue"
+import NoteView from "~/components/view/table/NoteView.vue"
 export default {
   components: {
+    NoteView,
     ViewToolbar,
     VariantsTables,
     VariantsListPanel,
-    CollapseButton,
-    AppButton
+    CollapseButton
   },
   data() {
     return {

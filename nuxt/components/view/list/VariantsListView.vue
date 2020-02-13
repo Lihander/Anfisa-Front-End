@@ -43,6 +43,7 @@ export default {
       newVariants.forEach(variant => {
         if (variant.details === null) {
           this.$store.dispatch("getVariantDetails", variant.id)
+          this.$store.dispatch("getVariantTagsAndNote", variant.id)
         }
       })
 

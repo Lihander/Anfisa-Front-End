@@ -31,7 +31,9 @@ export default {
   methods: {
     getWorkspaceDetails() {
       const { ws } = this.$route.query
-      this.$store.dispatch("getWorkspaceDetails", ws)
+      if (ws) {
+        this.$store.dispatch("getWorkspaceDetails", ws)
+      }
     }
   }
 }
