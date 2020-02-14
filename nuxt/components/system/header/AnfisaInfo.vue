@@ -1,16 +1,16 @@
 <template>
   <div class="anfisa-info content-row">
-    <div class="anfisa-info-project-name">
+    <div class="anfisa-info__project-name">
       {{ getVersionName }}
     </div>
-    <div class="anfisa-info-links content-row">
-      <div class="anfisa-info-link">
+    <div class="anfisa-info__links content-row">
+      <div class="anfisa-info__link">
         {{ getVersionNum }}
       </div>
-      <div class="anfisa-info-link">
+      <div class="anfisa-info__link">
         About
       </div>
-      <div class="anfisa-info-link">
+      <div class="anfisa-info__link">
         Help
       </div>
     </div>
@@ -39,16 +39,17 @@ export default {
 <style lang="scss">
 .anfisa-info {
   width: 100%;
+  height: 100%;
   border-top: 1px solid $default-color;
   background-color: $primary-color;
   color: $default-color;
   font-size: 12px;
-  &-project-name {
+  &__project-name {
     font-size: 14px;
     font-weight: 600;
     margin-right: 5px;
   }
-  &-link {
+  &__link {
     padding: 0 10px;
     border-right: 1px solid $default-color;
     cursor: pointer;

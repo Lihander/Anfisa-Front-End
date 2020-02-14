@@ -2,7 +2,12 @@
   <div class="tags-list">
     <div class="tags-list__search">
       <font-awesome-icon :icon="searchIcon" class="tags-list__search__icon" />
-      <input type="text" name="search" placeholder="Search in Tags" />
+      <input
+        v-model="search"
+        type="text"
+        name="search"
+        placeholder="Search in Tags"
+      />
     </div>
     <TagButton
       v-for="(tag, index) in getNotSelectedTags"
@@ -22,6 +27,7 @@ export default {
   components: { TagButton },
   data() {
     return {
+      search: "",
       addTagIcon: ["fas", "plus"],
       searchIcon: ["fas", "search"]
     }
@@ -30,13 +36,27 @@ export default {
     getNotSelectedTags() {
       const variantTags = this.$store.getters.getSelectedVariant.tags
       const allTags = this.$store.getters.getTags
-      const notSelectedTags = []
+      let search = this.search,
+        notSelectedTags = []
       allTags.forEach(tag => {
         if (variantTags.indexOf(tag) === -1) {
           notSelectedTags.push(tag)
         }
       })
+      if (search) {
+        search = search.trim().toLowerCase()
+        notSelectedTags = notSelectedTags.filter(item => {
+          if (item.toLowerCase().indexOf(search) !== -1) {
+            return item
+          }
+        })
+      }
       return notSelectedTags
+    }
+  },
+  watch: {
+    search(searchValue) {
+      this.$emit("search", searchValue)
     }
   },
   methods: {

@@ -2,8 +2,14 @@
   <header id="header" ref="header">
     <div class="navbar-content">
       <div class="left-side">
-        <Logo />
-        <AnfisaInfo />
+        <div class="left-side__anfisa-info">
+          <div class="left-side__anfisa-info__logo">
+            <Logo />
+          </div>
+          <div class="left-side__anfisa-info__info">
+            <AnfisaInfo />
+          </div>
+        </div>
         <div
           class="button-wrapper"
           :style="{
@@ -140,6 +146,16 @@ header {
   background-color: $secondary-color;
   @media screen and (max-width: $smDesktopWidth) {
     padding-right: 15px;
+  }
+  &__anfisa-info {
+    height: 100%;
+    width: 100%;
+    &__logo {
+      height: 70%;
+    }
+    &__info {
+      height: 30%;
+    }
   }
   .button-wrapper {
     position: absolute;

@@ -3,15 +3,8 @@
     <div class="tags-panel__icon">
       <font-awesome-icon :icon="['fas', 'tags']" />
     </div>
-    <div class="tags-panel__buttons default-scroll">
-      <TagButton
-        v-for="(tag, index) in getTags"
-        :key="index"
-        class="tags-panel__buttons__item"
-        :tag="tag"
-        :icon="removeTagIcon"
-        @click="toogleTag(tag)"
-      />
+    <div class="tags-panel__list">
+      <TagsHorizontalList :icon="removeTagIcon" :variant="getSelected" />
     </div>
     <CollapseButton
       slot="top-btns"
@@ -22,6 +15,7 @@
           : { borderRadius: '0 0 20px 0' }
       "
       btn-class="btnSuccess"
+      hide-class="btnDanger"
       :value="isAddTagsViewShow"
       :show-icon="addTagIcon"
       :hide-icon="removeTagIcon"
@@ -32,12 +26,12 @@
 </template>
 
 <script>
-import TagButton from "~/components/UI/Controls/TagButton.vue"
 import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
 import AddTagView from "~/components/view/table/AddTagView.vue"
+import TagsHorizontalList from "~/components/UI/Tags/TagsHorizontalList.vue"
 export default {
   name: "TagsPanel",
-  components: { AddTagView, CollapseButton, TagButton },
+  components: { TagsHorizontalList, AddTagView, CollapseButton },
   data() {
     return {
       addTagIcon: ["fas", "plus"],
@@ -47,13 +41,10 @@ export default {
   },
   computed: {
     getTags() {
-      return this.$store.getters.getSelectedVariant.tags
-    }
-  },
-  methods: {
-    toogleTag(tag) {
-      const variant = this.$store.getters.getSelectedVariant
-      this.$store.dispatch("saveVariantTagsAndNote", { variant, tag })
+      return this.getSelected.tags
+    },
+    getSelected() {
+      return this.$store.getters.getSelectedVariant
     }
   }
 }
@@ -82,18 +73,9 @@ export default {
     color: $primary-color;
     border-bottom-left-radius: 20px;
   }
-  &__buttons {
-    width: 88%;
+  &__list {
     height: 100%;
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    overflow-y: auto;
-    margin-left: 20px;
-    padding-bottom: 5px;
-    &__item {
-      width: unset;
-    }
+    margin: 0 40px 0 20px;
   }
   &__add-button {
     position: absolute;
@@ -103,9 +85,6 @@ export default {
     height: 40px;
     color: $success-color;
     transition: all 0.3s ease-in-out;
-    &:hover {
-      color: $neutral-placeholder;
-    }
   }
   .btn {
     &:hover {
@@ -117,11 +96,6 @@ export default {
     top: 40px;
     right: 29px;
     width: 90%;
-  }
-}
-.default-scroll {
-  &::-webkit-scrollbar {
-    height: 5px;
   }
 }
 </style>

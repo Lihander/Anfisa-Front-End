@@ -1,98 +1,96 @@
 <template>
   <div v-show="variant.details" class="variants-list-item">
-    <div class="variants-list-item__column" style="width: 12%">
-      <div v-show="isShowHGMD" class="variants-list-item__column__hgmd">
-        {{ getData("hgmd") }}
-      </div>
-      <div class="variants-list-item__column__title">
-        {{ getData("genes") }}
-      </div>
-      <div
-        class="variants-list-item__column__html"
-        v-html="getData('gtex')"
-      ></div>
-      <div v-if="getTags.length > 0" class="variants-list-item__column__tags">
-        <div class="variants-list-item__column__tags__wrapper default-scroll">
-          <TagButton
-            v-for="(tag, index) in getTags"
-            :key="index"
-            class="variants-list-item__column__tags__wrapper__item"
-            :tag="tag"
-          />
+    <div class="variants-list-item__wrapper">
+      <div class="variants-list-item__column" style="width: 12%">
+        <div v-show="isShowHGMD" class="variants-list-item__column__hgmd">
+          {{ getData("hgmd") }}
         </div>
+        <div class="variants-list-item__column__title">
+          {{ getData("genes") }}
+        </div>
+        <div
+          class="variants-list-item__column__html"
+          v-html="getData('gtex')"
+        ></div>
       </div>
-    </div>
-    <div class="variants-list-item__column" style="width: 12%">
-      <div class="variants-list-item__column__data">
-        {{ getData("hg19").split(/\s+/)[0] }}
+      <div class="variants-list-item__column" style="width: 12%">
+        <div class="variants-list-item__column__data">
+          {{ getData("hg19").split(/\s+/)[0] }}
+        </div>
+        <div
+          class="variants-list-item__column__html"
+          v-html="getData('hg19').split(/\s+/)[1]"
+        ></div>
+        <div
+          class="variants-list-item__column__html"
+          v-html="getIGVOpenLink"
+        ></div>
       </div>
-      <div
-        class="variants-list-item__column__html"
-        v-html="getData('hg19').split(/\s+/)[1]"
-      ></div>
-      <div
-        class="variants-list-item__column__html"
-        v-html="getIGVOpenLink"
-      ></div>
+      <div class="variants-list-item__column" style="width: 15%">
+        <BaseListItem :data="getData('canonical_annotation')" />
+        <BaseListItem :data="getData('ppos_canonical')" />
+      </div>
+      <div class="variants-list-item__column" style="width: 15%">
+        <PredicateItem
+          :predicate-title="'Polyphen'"
+          :predicate-data="getData('polyphen')"
+        />
+        <PredicateItem
+          :predicate-title="'SIFT'"
+          :predicate-data="getData('sift')"
+        />
+        <PredicateItem
+          :predicate-title="'MUT TASTER'"
+          :predicate-data="getData('mutation_taster')"
+        />
+        <PredicateItem
+          :predicate-title="'FATHMM'"
+          :predicate-data="getData('fathmm')"
+        />
+      </div>
+      <div class="variants-list-item__column" style="width: 15%">
+        <BaseListItem
+          :title="getTitle('overall_af')"
+          :data="getData('overall_af')"
+        />
+        <BaseListItem
+          :title="getTitle('overall_af_popmax')"
+          :data="getData('overall_af_popmax')"
+        />
+        <BaseListItem
+          :title="getTitle('genome_af')"
+          :data="getData('genome_af')"
+        />
+        <BaseListItem
+          :title="getTitle('genome_af_popmax')"
+          :data="getData('genome_af_popmax')"
+        />
+        <BaseListItem
+          :title="getTitle('exome_af')"
+          :data="getData('exome_af')"
+        />
+        <BaseListItem :title="'Hom'" :data="getData('hom')" />
+        <BaseListItem :title="'Hem'" :data="getData('hem')" />
+      </div>
+      <div class="variants-list-item__column" style="width: 25%">
+        <SampleItem
+          v-for="(name, index) in getData('title').slice(2)"
+          :key="index"
+          :data="name"
+        />
+        <BaseListItem
+          style="font-size: 12px"
+          :class="getFilterColor"
+          :data="getFilters"
+        />
+      </div>
+      <button class="more-button" @click="toggleToTableView">
+        <font-awesome-icon :icon="['fas', 'angle-double-right']" />
+      </button>
     </div>
-    <div class="variants-list-item__column" style="width: 15%">
-      <BaseListItem :data="getData('canonical_annotation')" />
-      <BaseListItem :data="getData('ppos_canonical')" />
+    <div class="variants-list-item__tags-list">
+      <TagsHorizontalList :variant="variant" />
     </div>
-    <div class="variants-list-item__column" style="width: 15%">
-      <PredicateItem
-        :predicate-title="'Polyphen'"
-        :predicate-data="getData('polyphen')"
-      />
-      <PredicateItem
-        :predicate-title="'SIFT'"
-        :predicate-data="getData('sift')"
-      />
-      <PredicateItem
-        :predicate-title="'MUT TASTER'"
-        :predicate-data="getData('mutation_taster')"
-      />
-      <PredicateItem
-        :predicate-title="'FATHMM'"
-        :predicate-data="getData('fathmm')"
-      />
-    </div>
-    <div class="variants-list-item__column" style="width: 15%">
-      <BaseListItem
-        :title="getTitle('overall_af')"
-        :data="getData('overall_af')"
-      />
-      <BaseListItem
-        :title="getTitle('overall_af_popmax')"
-        :data="getData('overall_af_popmax')"
-      />
-      <BaseListItem
-        :title="getTitle('genome_af')"
-        :data="getData('genome_af')"
-      />
-      <BaseListItem
-        :title="getTitle('genome_af_popmax')"
-        :data="getData('genome_af_popmax')"
-      />
-      <BaseListItem :title="getTitle('exome_af')" :data="getData('exome_af')" />
-      <BaseListItem :title="'Hom'" :data="getData('hom')" />
-      <BaseListItem :title="'Hem'" :data="getData('hem')" />
-    </div>
-    <div class="variants-list-item__column" style="width: 25%">
-      <SampleItem
-        v-for="(name, index) in getData('title').slice(2)"
-        :key="index"
-        :data="name"
-      />
-      <BaseListItem
-        style="font-size: 12px"
-        :class="getFilterColor"
-        :data="getFilters"
-      />
-    </div>
-    <button class="more-button" @click="toggleToTableView">
-      <font-awesome-icon :icon="['fas', 'angle-double-right']" />
-    </button>
   </div>
 </template>
 
@@ -100,10 +98,10 @@
 import PredicateItem from "~/components/view/list/PredicateItem.vue"
 import SampleItem from "~/components/view/list/SampleItem.vue"
 import BaseListItem from "~/components/UI/Lists/BaseListItem.vue"
-import TagButton from "~/components/UI/Controls/TagButton.vue"
+import TagsHorizontalList from "~/components/UI/Tags/TagsHorizontalList.vue"
 export default {
   name: "VariantsListItem",
-  components: { BaseListItem, PredicateItem, SampleItem, TagButton },
+  components: { TagsHorizontalList, BaseListItem, PredicateItem, SampleItem },
   props: {
     variant: {
       type: Object,
@@ -202,15 +200,19 @@ export default {
 .variants-list-item {
   height: 25vh;
   position: relative;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
   background-color: $default-color;
   border: 2px solid $secondary-color;
   border-radius: 10px;
   margin: 10px 20px;
-  padding: 5px 20px 5px 10px;
   font-size: 16px;
+  &__wrapper {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start;
+    padding: 5px 20px 5px 10px;
+  }
   &__column {
     text-align: left;
     height: 100%;
@@ -223,37 +225,12 @@ export default {
       font-weight: 800;
       color: $primary-color;
     }
-    &__tags {
-      width: 100%;
-      height: 60%;
-      margin-top: 5px;
-      padding: 0 0 0 5px;
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-      border: 1px solid $primary-color;
-      border-radius: 5px;
-      &__wrapper {
-        width: 100%;
-        height: 99%;
-        padding: 2px 2px 2px 0;
-        &__item {
-          width: 100%;
-          height: 20%;
-          margin-right: 0;
-          margin-bottom: 5px;
-          &.tag {
-            margin-right: 0;
-          }
-        }
-      }
-      .default-scroll {
-        &::-webkit-scrollbar {
-          width: 4px;
-        }
-        &::-webkit-scrollbar-thumb {
-          border-radius: 10px;
-        }
-      }
-    }
+  }
+  &__tags-list {
+    width: 98%;
+    height: 20%;
+    padding: 5px 10px;
+    margin-right: 20px;
   }
   .more-button {
     width: 20px;
