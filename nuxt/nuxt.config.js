@@ -16,7 +16,13 @@ export default {
         content: process.env.npm_package_description || ""
       }
     ],
-    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }]
+    link: [
+      { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css?family=Roboto"
+      }
+    ]
   },
   /*
    ** Customize the progress-bar color
@@ -56,6 +62,19 @@ export default {
    ** Build configuration
    */
   build: {
+    postcss: [
+      require("autoprefixer")(),
+      require("cssnano")({
+        preset: [
+          "default",
+          {
+            discardComments: {
+              removeAll: true
+            }
+          }
+        ]
+      })
+    ],
     /*
      ** You can extend webpack config here
      */

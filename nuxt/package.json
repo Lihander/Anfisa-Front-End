@@ -13,6 +13,10 @@
     "lintfix": "eslint --fix --ext .js,.vue --ignore-path .gitignore .",
     "precommit": "yarn lint"
   },
+  "browserslist": [
+    "> 1%",
+    "last 3 version"
+  ],
   "dependencies": {
     "@nuxtjs/axios": "^5.8.0",
     "@nuxtjs/style-resources": "^1.0.0",

@@ -66,6 +66,7 @@ export default {
     updateVariant() {
       const selectedVariantId = this.$store.getters.getSelectedVariantId
       this.$store.dispatch("getVariantDetails", selectedVariantId)
+      this.$store.dispatch("getVariantTagsAndNote", selectedVariantId)
     }
   }
 }
@@ -80,6 +81,7 @@ export default {
     display: flex;
     justify-content: space-around;
     align-items: center;
+    z-index: 1000;
     &__info {
       height: 100%;
       width: 50%;

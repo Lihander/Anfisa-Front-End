@@ -23,11 +23,11 @@ export default {
   methods: {
     onScroll(event) {
       const el = event.target
-      const elItem = el.firstElementChild
-      const diffHeight =
-        elItem.offsetHeight * this.itemPerPage * this.page - el.offsetHeight
 
-      if (diffHeight <= el.scrollTop) {
+      if (
+        el.scrollTop + el.clientHeight >=
+        el.scrollHeight - el.scrollHeight * 0.05
+      ) {
         this.page = this.page + 1
         const lastElementIndex = this.itemPerPage * this.page
         this.$emit("updateList", lastElementIndex)

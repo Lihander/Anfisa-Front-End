@@ -88,20 +88,47 @@
         <font-awesome-icon :icon="['fas', 'angle-double-right']" />
       </button>
     </div>
-    <div class="variants-list-item__tags-list">
-      <TagsHorizontalList :variant="variant" />
+    <div class="variants-list-item__footer">
+      <div class="variants-list-item__footer__main">
+        <CollapseButton
+          v-if="variant.note"
+          class="variants-list-item__footer__main__note-btn"
+          btn-class="btnPrimary"
+          hide-class="btnDanger"
+          :value="isNoteViewShow"
+          :show-icon="showNoteViewIcon"
+          :hide-icon="hideNoteViewIcon"
+          @change="isNoteViewShow = !isNoteViewShow"
+        />
+        <div class="variants-list-item__footer__main__tags-list">
+          <TagsHorizontalList :variant="variant" />
+        </div>
+      </div>
+      <div
+        v-show="variant.note && (isNoteViewShow || isShowAllNotes)"
+        class="variants-list-item__footer__note-view"
+      >
+        {{ variant.note }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
 import PredicateItem from "~/components/view/list/PredicateItem.vue"
 import SampleItem from "~/components/view/list/SampleItem.vue"
 import BaseListItem from "~/components/UI/Lists/BaseListItem.vue"
 import TagsHorizontalList from "~/components/UI/Tags/TagsHorizontalList.vue"
 export default {
   name: "VariantsListItem",
-  components: { TagsHorizontalList, BaseListItem, PredicateItem, SampleItem },
+  components: {
+    TagsHorizontalList,
+    BaseListItem,
+    PredicateItem,
+    SampleItem,
+    CollapseButton
+  },
   props: {
     variant: {
       type: Object,
@@ -110,9 +137,12 @@ export default {
   },
   data() {
     return {
+      showNoteViewIcon: ["fas", "clipboard"],
+      hideNoteViewIcon: ["fas", "times"],
       notPresent: "Not Present",
       pass: "PASS",
-      failed: "FAILED: "
+      failed: "FAILED: ",
+      isNoteViewShow: false
     }
   },
   computed: {
@@ -181,6 +211,14 @@ export default {
     },
     getFilterColor() {
       return this.getFilters === this.pass ? "filter__pass" : "filter__failed"
+    },
+    isShowAllNotes() {
+      return this.$store.getters.isShowAllNotes
+    }
+  },
+  watch: {
+    isShowAllNotes() {
+      this.isNoteViewShow = this.isShowAllNotes
     }
   },
   methods: {
@@ -198,16 +236,17 @@ export default {
 
 <style lang="scss">
 .variants-list-item {
-  height: 25vh;
+  min-height: 25vh;
   position: relative;
   background-color: $default-color;
   border: 2px solid $secondary-color;
   border-radius: 10px;
   margin: 10px 20px;
   font-size: 16px;
+  overflow: hidden;
   &__wrapper {
     width: 100%;
-    height: 80%;
+    min-height: 20vh;
     display: flex;
     justify-content: space-around;
     align-items: flex-start;
@@ -226,11 +265,39 @@ export default {
       color: $primary-color;
     }
   }
-  &__tags-list {
-    width: 98%;
-    height: 20%;
-    padding: 5px 10px;
+  &__footer {
     margin-right: 20px;
+    &__main {
+      position: relative;
+      width: 100%;
+      max-height: 5vh;
+      &__tags-list {
+        padding: 5px 10px;
+        margin-left: 50px;
+
+        .tags-horizontal-list {
+          justify-content: flex-end;
+        }
+      }
+
+      &__note-btn {
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        width: 50px;
+        border-radius: 0 5px 0 0;
+        border-width: 2px !important;
+        border-left: none !important;
+        border-bottom: none !important;
+        font-size: 20px;
+      }
+    }
+    &__note-view {
+      width: 100%;
+      background-color: $default-color;
+      border-top: 2px solid $danger-color;
+      padding: 5px 10px;
+    }
   }
   .more-button {
     width: 20px;

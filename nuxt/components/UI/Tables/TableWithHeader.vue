@@ -11,7 +11,9 @@
       </div>
     </div>
     <div v-show="tableCollapse" class="table__wrapper default-scroll">
-      <BaseTable :data="tableData.data" />
+      <div class="table__wrapper__content">
+        <BaseTable :data="tableData.data" />
+      </div>
     </div>
   </div>
 </template>
@@ -42,6 +44,12 @@ export default {
     width: 100%;
     display: inline-block;
     padding: 10px;
+
+    .default-scroll {
+      &::-webkit-scrollbar {
+        height: 10px;
+      }
+    }
   }
 }
 
@@ -75,6 +83,10 @@ export default {
 .table {
   &__wrapper {
     width: 100%;
+    transform: rotateX(180deg);
+    &__content {
+      transform: rotateX(180deg);
+    }
   }
 }
 </style>

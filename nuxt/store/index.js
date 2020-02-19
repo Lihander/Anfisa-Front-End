@@ -9,7 +9,9 @@ export const state = () => ({
   filteredVariants: 0,
   transcripts: [],
   selectedVariantId: "",
-  tags: []
+  tags: [],
+  isShowAllNotes: false,
+  noteStatus: ""
 })
 
 export const mutations = {
@@ -62,6 +64,12 @@ export const mutations = {
   },
   setTags(state, payload) {
     state.tags = payload.tags
+  },
+  setNoteStatus(state, payload) {
+    state.noteStatus = payload.noteStatus
+  },
+  updateShowAllNotes(state, isShowAllNotes) {
+    state.isShowAllNotes = isShowAllNotes
   },
   resetWorkspace(state) {
     state.variants = []
@@ -159,13 +167,14 @@ export const actions = {
 
   async saveVariantTagsAndNote({ commit }, payload) {
     const variantId = payload.variant.id
+    const note = this.getters.getVariantNoteById(variantId)
     const tag = payload.tag
     const params = new URLSearchParams()
     const NOTE_TAG = "_note"
     const tagsObject = {}
 
-    if (this.state.note) {
-      tagsObject[NOTE_TAG] = this.state.note.trim()
+    if (note) {
+      tagsObject[NOTE_TAG] = note.trim()
     }
 
     this.state.tags.forEach(item => {
@@ -185,18 +194,10 @@ export const actions = {
     await this.$axios
       .$post("/tags", params)
       .then(response => {
-        const selectedTags = Object.keys(response["rec-tags"]).filter(
-          item => response["rec-tags"][item] && item !== NOTE_TAG
-        )
-        const note = response["rec-tags"][NOTE_TAG] || ""
-        const tags = [...response["check-tags"], ...response["op-tags"]].filter(
-          item => item !== NOTE_TAG
-        )
-        commit("setVariantTags", { variantId, selectedTags })
-        commit("setVariantNote", { variantId, note })
-        commit("setTags", { variantId, tags })
+        commit("setNoteStatus", { noteStatus: "Saved" })
       })
       .catch(error => {
+        commit("setNoteStatus", { noteStatus: error })
         console.log(error)
       })
   }
@@ -275,5 +276,11 @@ export const getters = {
   },
   getTags(state) {
     return state.tags
+  },
+  getNoteStatus(state) {
+    return state.noteStatus
+  },
+  isShowAllNotes(state) {
+    return state.isShowAllNotes
   }
 }

@@ -5,10 +5,22 @@
         <ViewToolbar>
           <AppButton
             slot="btns"
+            style="padding-right: 5px;"
             class="buttons-list__button"
             btn-class="btnDefault"
+            @click="updateShowAllNotes"
           >
             <font-awesome-icon :icon="['fas', 'clipboard']" />
+            <font-awesome-icon
+              v-if="!isShowAllNotes"
+              class="sticker green-eye"
+              :icon="['fas', 'eye']"
+            />
+            <font-awesome-icon
+              v-if="isShowAllNotes"
+              class="sticker red-eye"
+              :icon="['fas', 'eye-slash']"
+            />
           </AppButton>
         </ViewToolbar>
       </div>
@@ -23,7 +35,20 @@ import VariantsListView from "~/components/view/list/VariantsListView"
 import AppButton from "~/components/UI/Controls/Button.vue"
 export default {
   name: "Index",
-  components: { VariantsListView, ViewToolbar, AppButton }
+  components: { VariantsListView, ViewToolbar, AppButton },
+  computed: {
+    isShowAllNotes() {
+      return this.$store.getters.isShowAllNotes
+    },
+    getStickerColor() {
+      return this.isShowAllNotes ? "red-eye" : "green-eye"
+    }
+  },
+  methods: {
+    updateShowAllNotes() {
+      this.$store.commit("updateShowAllNotes", !this.isShowAllNotes)
+    }
+  }
 }
 </script>
 
@@ -39,5 +64,17 @@ export default {
 }
 .buttons-list__button {
   z-index: 1000;
+}
+.sticker {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 18px;
+}
+.green-eye {
+  color: $success-color;
+}
+.red-eye {
+  color: $danger-color
 }
 </style>

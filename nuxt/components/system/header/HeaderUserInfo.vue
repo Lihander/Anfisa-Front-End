@@ -2,7 +2,7 @@
   <div class="user-info">
     <div class="report">
       <span>Report</span>
-      <AppButton class="btnPrimary">
+      <AppButton class="btnPrimary report__export-btn">
         EXPORT
       </AppButton>
     </div>
@@ -52,6 +52,9 @@ export default {
     span {
       font-size: 18px;
       margin-bottom: 5px;
+    }
+    &__export-btn {
+      border-color: $default-color !important;
     }
   }
   .fa-user-circle {

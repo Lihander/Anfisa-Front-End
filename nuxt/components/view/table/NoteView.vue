@@ -10,15 +10,7 @@
       :hide-icon="hideNoteViewIcon"
       @change="isNoteViewShow = !isNoteViewShow"
     />
-    <div
-      v-show="isNoteViewShow"
-      class="note-view__wrapper"
-      :style="
-        isNoteViewShow
-          ? { borderBottomRightRadius: '0' }
-          : { borderBottomRightRadius: '20px' }
-      "
-    >
+    <div v-show="isNoteViewShow" class="note-view__wrapper">
       <div class="note-view__wrapper__content">
         <textarea
           id="story"
@@ -30,13 +22,21 @@
         >
         </textarea>
       </div>
-      <AppButton
-        class="note-view__save-button"
-        btn-class="btnSuccess"
-        @click="saveNote"
-      >
-        <font-awesome-icon :icon="saveNoteIcon" />
-      </AppButton>
+      <div class="note-view__wrapper__footer">
+        <div
+          v-if="getNoteStatus"
+          class="note-view__wrapper__footer__note-status"
+        >
+          {{ getNoteStatus }}
+        </div>
+        <AppButton
+          class="note-view__wrapper__footer__save-button"
+          btn-class="btnSuccess"
+          @click="saveNote"
+        >
+          <font-awesome-icon :icon="saveNoteIcon" />
+        </AppButton>
+      </div>
     </div>
   </div>
 </template>
@@ -64,12 +64,22 @@ export default {
         const variantId = this.$store.getters.getSelectedVariant.id
         this.$store.commit("setVariantNote", { variantId, note })
       }
+    },
+    getNoteStatus() {
+      return this.$store.getters.getNoteStatus
+    }
+  },
+  watch: {
+    getNoteStatus() {
+      setTimeout(() => {
+        this.$store.commit("setNoteStatus", "")
+      }, 3000)
     }
   },
   methods: {
     saveNote() {
       const variant = this.$store.getters.getSelectedVariant
-      this.$store.dispatch("saveVariantTagsAndNote", variant)
+      this.$store.dispatch("saveVariantTagsAndNote", { variant })
     }
   }
 }
@@ -88,16 +98,19 @@ export default {
     right: -395px;
     width: 400px;
     height: 400px;
-    background-color: $default-color;
+    background-color: $border-lightex;
     border: 5px solid $accent-color;
     border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
     border-top-right-radius: 20px;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     z-index: 999;
+    overflow: hidden;
     &__content {
       width: 100%;
-      height: 100%;
+      height: 85%;
       padding: 10px 0;
+      background-color: $default-color;
       textarea {
         height: 100%;
         padding: 5px 10px;
@@ -109,18 +122,23 @@ export default {
         }
       }
     }
-  }
-  &__save-button {
-    height: 50px;
-    width: 50px;
-    position: absolute;
-    bottom: -5px;
-    right: -50px;
-    border-radius: 0 50% 50% 0;
-    border-width: 5px !important;
-    border-left: none !important;
-    z-index: 1000;
-    box-shadow: 5px 0 20px rgba(255, 255, 255, 0.5);
+    &__footer {
+      height: 15%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding: 10px 0;
+      &__note-status {
+        width: 80%;
+        text-align: center;
+      }
+      &__save-button {
+        height: 50px !important;
+        width: 50px !important;
+        border-radius: 50%;
+        margin: 0 10px;
+      }
+    }
   }
 }
 .hide-button {

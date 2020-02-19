@@ -16,7 +16,9 @@ html {
 		font-size: 14px;
   }
 }
-
+:root{
+  scrollbar-width: none;
+}
 body {
   font-family: $mainFont;
 	font-size: $mainFontSize;

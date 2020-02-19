@@ -20,7 +20,7 @@
 
   &.btnPrimary {
     color: $default-color;
-    border: 1px solid $border-base;
+    border: 1px solid $primary-color;
     background-color: $primary-color;
     &:hover, :focus {
       color: $primary-color;
