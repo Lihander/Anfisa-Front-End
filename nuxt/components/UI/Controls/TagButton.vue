@@ -39,7 +39,7 @@ export default {
       if (Object.prototype.hasOwnProperty.call(TAGS_COLORS, tag)) {
         return TAGS_COLORS[tag]
       }
-      return null
+      return "#606266"
     }
   }
 }

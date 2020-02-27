@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import TableWithHeader from "~/components/UI/Tables/TableWithHeader"
-import CollapseButton from "~/components/UI/Controls/CollapseButton"
+import TableWithHeader from "~/components/UI/Tables/TableWithHeader.vue"
+import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
 
 export default {
   name: "VariantDetailTable",

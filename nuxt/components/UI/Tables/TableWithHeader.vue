@@ -12,7 +12,10 @@
     </div>
     <div v-show="tableCollapse" class="table__wrapper default-scroll">
       <div class="table__wrapper__content">
-        <BaseTable :data="tableData.data" />
+        <BaseTable v-if="tableData.type !== 'pre'" :data="tableData.data" />
+        <div class="varinat-content" v-else>
+          <pre>{{ tableData.content }}</pre>
+        </div>
       </div>
     </div>
   </div>
@@ -66,8 +69,8 @@ export default {
   }
   &__title {
     flex: 1;
-    font-weight: 600;
-    font-size: 20px;
+    font-weight: 800;
+    font-size: 16px;
   }
   &__buttons-list {
     flex: 2;
@@ -88,5 +91,11 @@ export default {
       transform: rotateX(180deg);
     }
   }
+}
+
+.varinat-content {
+  background-color: $default-color;
+  padding: 10px 20px;
+  font-size: 14px;
 }
 </style>

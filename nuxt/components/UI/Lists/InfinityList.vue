@@ -26,7 +26,7 @@ export default {
 
       if (
         el.scrollTop + el.clientHeight >=
-        el.scrollHeight - el.scrollHeight * 0.05
+        el.scrollHeight - el.scrollHeight * 0.1
       ) {
         this.page = this.page + 1
         const lastElementIndex = this.itemPerPage * this.page

@@ -11,7 +11,8 @@ export const state = () => ({
   selectedVariantId: "",
   tags: [],
   isShowAllNotes: false,
-  noteStatus: ""
+  noteStatus: "",
+  meta: null
 })
 
 export const mutations = {
@@ -70,6 +71,9 @@ export const mutations = {
   },
   updateShowAllNotes(state, isShowAllNotes) {
     state.isShowAllNotes = isShowAllNotes
+  },
+  setMeta(state, meta) {
+    state.meta = meta
   },
   resetWorkspace(state) {
     state.variants = []
@@ -194,10 +198,31 @@ export const actions = {
     await this.$axios
       .$post("/tags", params)
       .then(response => {
+        const selectedTags = Object.keys(response["rec-tags"]).filter(
+          item => response["rec-tags"][item] && item !== NOTE_TAG
+        )
+        const tags = [...response["check-tags"], ...response["op-tags"]].filter(
+          item => item !== NOTE_TAG
+        )
+        commit("setVariantTags", { variantId, selectedTags })
+        commit("setTags", { variantId, tags })
         commit("setNoteStatus", { noteStatus: "Saved" })
       })
       .catch(error => {
         commit("setNoteStatus", { noteStatus: error })
+        console.log(error)
+      })
+  },
+
+  async getMeta({ commit }, selectedWorkspace) {
+    const params = new URLSearchParams()
+    params.append("ds", selectedWorkspace)
+    await this.$axios
+      .$post("/dsmeta", params)
+      .then(response => {
+        commit("setMeta", response)
+      })
+      .catch(error => {
         console.log(error)
       })
   }
@@ -215,6 +240,20 @@ export const getters = {
   },
   getVariants(state) {
     return state.variants
+  },
+  getVariantsByGroups(state) {
+    const regExp = /^\[.+\]/
+    const variantsByGroups = {}
+    state.variants.forEach(item => {
+      const group = regExp.exec(item.name)
+      if (group) {
+        if (!variantsByGroups[group]) {
+          variantsByGroups[group] = []
+        }
+        variantsByGroups[group].push(item)
+      }
+    })
+    return variantsByGroups
   },
   getTotalVariants(state) {
     return state.totalVariants
@@ -235,30 +274,6 @@ export const getters = {
   },
   getVariantById: state => id => {
     return state.variants.find(variant => variant.id === id)
-  },
-  getVariantDetailDataByVariantIdAndName: state => (id, name) => {
-    const variant = state.variants.find(variant => variant.id === id)
-    if (variant) {
-      const details = variant.details
-      if (details) {
-        for (const table in details) {
-          if (Object.prototype.hasOwnProperty.call(details, table)) {
-            const detail = details[table].data
-            if (detail && detail.length > 0) {
-              const data = detail.find(data => {
-                if (data[0] && data[0].name) {
-                  return data[0].name.toLowerCase() === name.toLowerCase()
-                }
-              })
-              if (data) {
-                return data
-              }
-            }
-          }
-        }
-      }
-    }
-    return ""
   },
   getVariantTagsById: state => id => {
     const variant = state.variants.find(variant => variant.id === id)
@@ -282,5 +297,8 @@ export const getters = {
   },
   isShowAllNotes(state) {
     return state.isShowAllNotes
+  },
+  getMeta(state) {
+    return state.meta
   }
 }

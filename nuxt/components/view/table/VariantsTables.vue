@@ -1,6 +1,6 @@
 <template>
   <div class="variants-tables default-scroll">
-    <TableViewTitle />
+    <VariantsToolbar />
     <div class="variants-tables__wrapper">
       <VariantDetailTable :table-name="'view_gen'" />
       <VariantDetailTable :table-name="'view_qsamples'" />
@@ -12,16 +12,17 @@
       <VariantDetailTable :table-name="'view_pred'" />
       <VariantDetailTable :table-name="'transcripts'" />
       <VariantDetailTable :table-name="'view_cohorts'" />
+      <VariantDetailTable :table-name="'VCF'" />
     </div>
   </div>
 </template>
 
 <script>
 import VariantDetailTable from "~/components/UI/Tables/VariantDetailTable.vue"
-import TableViewTitle from "~/components/view/table/TableViewTitle.vue"
+import VariantsToolbar from "~/components/view/table/VariantsToolbar.vue"
 export default {
   name: "VariantsTables",
-  components: { TableViewTitle, VariantDetailTable }
+  components: { VariantsToolbar, VariantDetailTable }
 }
 </script>
 

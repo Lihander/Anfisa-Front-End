@@ -1,25 +1,25 @@
 <template>
-  <div v-show="variant.details" class="variants-list-item">
+  <div v-if="variant.details" class="variants-list-item">
     <div class="variants-list-item__wrapper">
       <div class="variants-list-item__column" style="width: 12%">
         <div v-show="isShowHGMD" class="variants-list-item__column__hgmd">
-          {{ getData("hgmd") }}
+          {{ getData("hgmd").data[0] }}
         </div>
         <div class="variants-list-item__column__title">
-          {{ getData("genes") }}
+          {{ getData("genes").data[0] }}
         </div>
         <div
           class="variants-list-item__column__html"
-          v-html="getData('gtex')"
+          v-html="getData('gtex').data[0]"
         ></div>
       </div>
       <div class="variants-list-item__column" style="width: 12%">
         <div class="variants-list-item__column__data">
-          {{ getData("hg19").split(/\s+/)[0] }}
+          {{ getData("hg19").data[0].split(/\s+/)[0] }}
         </div>
         <div
           class="variants-list-item__column__html"
-          v-html="getData('hg19').split(/\s+/)[1]"
+          v-html="getData('hg19').data[0].split(/\s+/)[1]"
         ></div>
         <div
           class="variants-list-item__column__html"
@@ -27,62 +27,53 @@
         ></div>
       </div>
       <div class="variants-list-item__column" style="width: 15%">
-        <BaseListItem :data="getData('canonical_annotation')" />
-        <BaseListItem :data="getData('ppos_canonical')" />
+        <BaseListItem :data="getData('canonical_annotation').data[0]" />
+        <BaseListItem :data="getData('ppos_canonical').data[0]" />
       </div>
       <div class="variants-list-item__column" style="width: 15%">
         <PredicateItem
           :predicate-title="'Polyphen'"
-          :predicate-data="getData('polyphen')"
+          :predicate-data="getData('polyphen').data[0]"
         />
         <PredicateItem
           :predicate-title="'SIFT'"
-          :predicate-data="getData('sift')"
+          :predicate-data="getData('sift').data[0]"
         />
         <PredicateItem
           :predicate-title="'MUT TASTER'"
-          :predicate-data="getData('mutation_taster')"
+          :predicate-data="getData('mutation_taster').data[0]"
         />
         <PredicateItem
           :predicate-title="'FATHMM'"
-          :predicate-data="getData('fathmm')"
+          :predicate-data="getData('fathmm').data[0]"
         />
       </div>
       <div class="variants-list-item__column" style="width: 15%">
         <BaseListItem
-          :title="getTitle('overall_af')"
-          :data="getData('overall_af')"
+          :title="getData('overall_af').title"
+          :data="getData('overall_af').data[0]"
         />
         <BaseListItem
-          :title="getTitle('overall_af_popmax')"
-          :data="getData('overall_af_popmax')"
+          :title="getData('overall_af_popmax').title"
+          :data="getData('overall_af_popmax').data[0]"
         />
         <BaseListItem
-          :title="getTitle('genome_af')"
-          :data="getData('genome_af')"
+          :title="getData('genome_af').title"
+          :data="getData('genome_af').data[0]"
         />
         <BaseListItem
-          :title="getTitle('genome_af_popmax')"
-          :data="getData('genome_af_popmax')"
+          :title="getData('genome_af_popmax').title"
+          :data="getData('genome_af_popmax').data[0]"
         />
         <BaseListItem
-          :title="getTitle('exome_af')"
-          :data="getData('exome_af')"
+          :title="getData('exome_af').title"
+          :data="getData('exome_af').data[0]"
         />
-        <BaseListItem :title="'Hom'" :data="getData('hom')" />
-        <BaseListItem :title="'Hem'" :data="getData('hem')" />
+        <BaseListItem :title="'Hom'" :data="getData('hom').data[0]" />
+        <BaseListItem :title="'Hem'" :data="getData('hem').data[0]" />
       </div>
       <div class="variants-list-item__column" style="width: 25%">
-        <SampleItem
-          v-for="(name, index) in getData('title').slice(2)"
-          :key="index"
-          :data="name"
-        />
-        <BaseListItem
-          style="font-size: 12px"
-          :class="getFilterColor"
-          :data="getFilters"
-        />
+        <SampleColumn :table="getTableByName('view_qsamples')" />
       </div>
       <button class="more-button" @click="toggleToTableView">
         <font-awesome-icon :icon="['fas', 'angle-double-right']" />
@@ -117,16 +108,17 @@
 <script>
 import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
 import PredicateItem from "~/components/view/list/PredicateItem.vue"
-import SampleItem from "~/components/view/list/SampleItem.vue"
+import SampleColumn from "~/components/view/list/SampleColumn.vue"
 import BaseListItem from "~/components/UI/Lists/BaseListItem.vue"
 import TagsHorizontalList from "~/components/UI/Tags/TagsHorizontalList.vue"
+import * as utils from "~/assets/js/utils"
 export default {
   name: "VariantsListItem",
   components: {
     TagsHorizontalList,
     BaseListItem,
     PredicateItem,
-    SampleItem,
+    SampleColumn,
     CollapseButton
   },
   props: {
@@ -140,48 +132,10 @@ export default {
       showNoteViewIcon: ["fas", "clipboard"],
       hideNoteViewIcon: ["fas", "times"],
       notPresent: "Not Present",
-      pass: "PASS",
-      failed: "FAILED: ",
       isNoteViewShow: false
     }
   },
   computed: {
-    getDetailData() {
-      const vm = this
-      return name => {
-        if (vm.variant) {
-          const id = vm.variant.id
-          return vm.$store.getters.getVariantDetailDataByVariantIdAndName(
-            id,
-            name
-          )
-        } else {
-          return ""
-        }
-      }
-    },
-    getTitle() {
-      const vm = this
-      return name => {
-        const detailData = vm.getDetailData(name)
-        if (detailData && detailData[0]) {
-          return detailData[0].title
-        } else {
-          return ""
-        }
-      }
-    },
-    getData() {
-      const vm = this
-      return name => {
-        const detailData = vm.getDetailData(name)
-        if (detailData && detailData[0]) {
-          return detailData[0].data[0]
-        } else {
-          return ""
-        }
-      }
-    },
     getTags() {
       if (this.variant) {
         return this.variant.tags
@@ -192,25 +146,20 @@ export default {
       const hgmd = this.getData("hgmd")
       return (
         hgmd &&
-        hgmd.toLowerCase().trim() !== this.notPresent.toLowerCase().trim()
+        hgmd.data[0] &&
+        hgmd.data[0].toLowerCase().trim() !==
+          this.notPresent.toLowerCase().trim()
       )
     },
     getIGVOpenLink() {
-      const igv = this.getData("igv")
+      const igv = this.getData("igv").data[0]
+      if (!igv) {
+        return ""
+      }
       const closeLinkTag = "</a>"
       const startLink = igv.indexOf("<a")
       const endLink = igv.indexOf(closeLinkTag)
       return igv.substring(startLink, endLink + closeLinkTag.length)
-    },
-    getFilters() {
-      const filtersString = this.getData("ft").toString()
-      if (filtersString.toLowerCase() !== this.pass.toLowerCase()) {
-        return this.failed + filtersString
-      }
-      return this.pass
-    },
-    getFilterColor() {
-      return this.getFilters === this.pass ? "filter__pass" : "filter__failed"
     },
     isShowAllNotes() {
       return this.$store.getters.isShowAllNotes
@@ -222,6 +171,27 @@ export default {
     }
   },
   methods: {
+    getData(name) {
+      const details = this.variant.details
+      for (const table in details) {
+        if (Object.prototype.hasOwnProperty.call(details, table)) {
+          const data = utils.getDataFromTableByName(details[table], name)
+          if (data) {
+            return data[0]
+          }
+        }
+      }
+      return {
+        title: "",
+        data: [""]
+      }
+    },
+    getTableByName(name) {
+      const details = this.variant.details
+      if (Object.prototype.hasOwnProperty.call(details, name)) {
+        return details[name]
+      }
+    },
     toggleToTableView() {
       this.$store.commit("setSelectedVariantId", this.variant.id)
       const selectedWorkspace = this.$store.getters.getSelectedWorkspace

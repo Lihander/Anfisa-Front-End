@@ -39,7 +39,7 @@
 import AppButton from "~/components/UI/Controls/Button.vue"
 import TagsPanel from "~/components/view/table/TagsPanel.vue"
 export default {
-  name: "TableViewTitle",
+  name: "VariantsToolbar",
   components: { TagsPanel, AppButton },
   data() {
     return {

@@ -4,15 +4,15 @@
       <DefaultSwitcher :items="switchItems" @selected="selectedItemChange" />
     </div>
     <div class="variants-list__wrapper default-scroll">
-      <div
-        v-for="item in getVariants"
-        :key="item.id"
-        class="variants-list__item"
-        :class="getSelectedVariantClass(item)"
-        tabindex="-1"
-        @click="getVariantsDetails(item)"
-      >
-        <VariantsItem :item="item" />
+      <div v-if="selectedItem.name === 'VARIANTS'" class="variants">
+        <VariantsItem v-for="item in getVariants" :key="item.id" :item="item" />
+      </div>
+      <div v-else class="genes">
+        <VariantsGroup
+          v-for="(group, index) in getVariantsGroupName"
+          :key="index"
+          :group="group"
+        />
       </div>
     </div>
   </div>
@@ -21,9 +21,10 @@
 <script>
 import VariantsItem from "~/components/view/table/VariantsItem.vue"
 import DefaultSwitcher from "~/components/UI/Controls/DefaultSwitcher.vue"
+import VariantsGroup from "~/components/view/table/VariantsGroup"
 export default {
   name: "VariantsList",
-  components: { DefaultSwitcher, VariantsItem },
+  components: { VariantsGroup, DefaultSwitcher, VariantsItem },
   data() {
     return {
       switchItems: [
@@ -45,12 +46,13 @@ export default {
     getVariants() {
       return this.$store.getters.getVariants
     },
-    getSelectedVariantClass() {
-      return item => {
-        return this.getSelectedVariantsId === item.id
-          ? "variants-list__item__active"
-          : ""
-      }
+    getVariantsGroupName() {
+      return Object.keys(this.$store.getters.getVariantsByGroups)
+    },
+    selectedItem() {
+      return this.switchItems.find(item => {
+        return item.isActive === true
+      })
     }
   },
   watch: {
@@ -64,7 +66,11 @@ export default {
   methods: {
     scrollToItem() {
       const panel = this.$el.querySelector(".variants-list__wrapper")
-      const item = panel.firstElementChild
+      const variantsList = this.$el.querySelector(".variants")
+      if (!variantsList) {
+        return
+      }
+      const item = variantsList.firstElementChild
       if (item) {
         const selectedVariantPosition =
           item.offsetHeight * this.getSelectedVariantsId
@@ -80,15 +86,6 @@ export default {
       this.switchItems.map(item => {
         item.isActive = selectedItem.name === item.name
       })
-    },
-    getVariantsDetails(item) {
-      if (this.getSelectedVariantsId !== item.id) {
-        if (item.details === null) {
-          this.$store.dispatch("getVariantDetails", item.id)
-          this.$store.dispatch("getVariantTagsAndNote", item.id)
-        }
-        this.$store.commit("setSelectedVariantId", item.id)
-      }
     }
   }
 }
@@ -111,34 +108,6 @@ export default {
   }
   &__wrapper {
     height: 95%;
-  }
-  &__item {
-    cursor: pointer;
-    padding: 5px 0;
-    border-bottom: 1px solid $border-base;
-    transition: all ease 0.3s;
-
-    &:hover {
-      color: $primary-color;
-      background-color: $light-color;
-    }
-
-    &__active {
-      color: $default-color;
-      background-color: $primary-color;
-
-      &:hover {
-        color: $default-color;
-        background-color: $primary-color;
-      }
-
-      .variant-item {
-        &__type {
-          opacity: 1;
-          width: 30px;
-        }
-      }
-    }
   }
 }
 </style>

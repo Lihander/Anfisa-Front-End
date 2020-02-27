@@ -16,14 +16,32 @@ export function prepareVariantDetails(data) {
         title: item.title,
         data: tableData,
         collapseTable: false,
+        type: item.type,
         ...(item.colhead ? { colhead: item.colhead } : {})
       }
     } else if (item.type === "pre") {
       result[item.title] = {
         title: item.title,
-        content: item.content
+        content: item.content,
+        collapseTable: false,
+        type: item.type
       }
     }
   })
   return result
+}
+
+export function getDataFromTableByName(table, name) {
+  const detail = table.data
+  if (detail && detail.length > 0) {
+    const data = detail.find(data => {
+      if (data[0] && data[0].name) {
+        return data[0].name.toLowerCase() === name.toLowerCase()
+      }
+    })
+    if (data) {
+      return data
+    }
+  }
+  return null
 }

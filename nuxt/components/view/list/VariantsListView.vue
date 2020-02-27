@@ -24,6 +24,9 @@ export default {
     }
   },
   computed: {
+    meta() {
+      return this.$store.getters.getMeta
+    },
     variants() {
       return this.$store.getters.getVariants
     }
@@ -48,7 +51,9 @@ export default {
       })
 
       newVariants.forEach(variant => {
-        this.slicedVariants.push(variant)
+        if (!this.slicedVariants.some(v => v.id === variant.id)) {
+          this.slicedVariants.push(variant)
+        }
       })
     },
     updateListLength(newLength) {

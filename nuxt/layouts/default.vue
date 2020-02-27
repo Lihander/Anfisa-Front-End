@@ -33,6 +33,7 @@ export default {
       const { ws } = this.$route.query
       if (ws) {
         this.$store.dispatch("getWorkspaceDetails", ws)
+        this.$store.dispatch("getMeta", ws)
       }
     }
   }
