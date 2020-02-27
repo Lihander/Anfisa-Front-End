@@ -27,12 +27,12 @@ export default {
         {
           view: "variantsListView",
           icon: ["fas", "list"],
-          isActive: this.$route.path === "/variantsListView"
+          path: "/variantsListView"
         },
         {
           view: "variantsTableView",
           icon: ["fas", "th"],
-          isActive: this.$route.path === "/variantsTableView"
+          path: "/variantsTableView"
         }
       ]
     }
@@ -40,7 +40,7 @@ export default {
   computed: {
     getInactiveViewItems() {
       return this.viewItems.filter(item => {
-        return !item.isActive
+        return this.checkPath(item.path)
       })
     }
   },
@@ -54,6 +54,9 @@ export default {
         path: "/" + selectedItem.view,
         query: { ws: selectedWorkspace }
       })
+    },
+    checkPath(path) {
+      return this.$route.path === path
     }
   }
 }
