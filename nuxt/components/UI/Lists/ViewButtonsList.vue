@@ -2,8 +2,7 @@
   <ButtonsList>
     <div slot="btns" class="view-buttons__wrapper">
       <AppButton
-        v-for="item in viewItems"
-        v-show="!item.isActive"
+        v-for="item in getInactiveViewItems"
         :key="item.view"
         class="view-buttons__button"
         btn-class="btnDefault"
@@ -36,6 +35,13 @@ export default {
           isActive: this.$route.path === "/variantsTableView"
         }
       ]
+    }
+  },
+  computed: {
+    getInactiveViewItems() {
+      return this.viewItems.filter(item => {
+        return !item.isActive
+      })
     }
   },
   methods: {
