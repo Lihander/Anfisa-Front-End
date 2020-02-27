@@ -26,29 +26,20 @@ export default {
       viewItems: [
         {
           view: "variantsListView",
-          icon: ["fas", "list"],
-          path: "/variantsListView"
+          icon: ["fas", "list"]
         },
         {
           view: "variantsTableView",
-          icon: ["fas", "th"],
-          path: "/variantsTableView"
+          icon: ["fas", "th"]
         }
       ]
     }
   },
   computed: {
     getInactiveViewItems() {
-      console.log(this.$route.path)
-      console.log(this.viewItems)
       return this.viewItems.filter(item => {
-        return !this.checkPath(item.path)
+        return this.$route.name === item.view
       })
-    }
-  },
-  watch: {
-    "$route.path"() {
-      this.getInactiveViewItems()
     }
   },
   methods: {
@@ -61,9 +52,6 @@ export default {
         path: "/" + selectedItem.view,
         query: { ws: selectedWorkspace }
       })
-    },
-    checkPath(path) {
-      return this.$route.path === path
     }
   }
 }
