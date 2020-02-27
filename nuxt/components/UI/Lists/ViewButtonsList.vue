@@ -39,9 +39,16 @@ export default {
   },
   computed: {
     getInactiveViewItems() {
+      console.log(this.$route.path)
+      console.log(this.viewItems)
       return this.viewItems.filter(item => {
-        return this.checkPath(item.path)
+        return !this.checkPath(item.path)
       })
+    }
+  },
+  watch: {
+    "$route.path"() {
+      this.getInactiveViewItems()
     }
   },
   methods: {
