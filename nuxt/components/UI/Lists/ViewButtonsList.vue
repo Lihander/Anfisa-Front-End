@@ -2,7 +2,8 @@
   <ButtonsList>
     <div slot="btns" class="view-buttons__wrapper">
       <AppButton
-        v-for="item in getInactiveViewItems"
+        v-for="item in viewItems"
+        v-show="isInactiveViewItem(item)"
         :key="item.view"
         class="view-buttons__button"
         btn-class="btnDefault"
@@ -35,14 +36,10 @@ export default {
       ]
     }
   },
-  computed: {
-    getInactiveViewItems() {
-      return this.viewItems.filter(item => {
-        return this.$route.name === item.view
-      })
-    }
-  },
   methods: {
+    isInactiveViewItem(item) {
+      return this.$route.name !== item.view
+    },
     viewChange(selectedItem) {
       this.viewItems.map(item => {
         item.isActive = selectedItem.view === item.view
