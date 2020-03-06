@@ -3,7 +3,7 @@
     <div class="title__wrapper__info">
       <AppButton
         class="title__options__update-button"
-        :btn-class="'btnSpin'"
+        :btn-class="'btnWithoutBorder'"
         @click="updateVariant()"
       >
         <font-awesome-icon :icon="updateIcon" />
@@ -24,7 +24,10 @@
         >
           <font-awesome-icon :icon="compressAllIcon" />
         </AppButton>
-        <AppButton class="title__options__button" :btn-class="'btnSpin'">
+        <AppButton
+          class="title__options__button"
+          :btn-class="'btnWithoutBorder'"
+        >
           <font-awesome-icon :icon="settingsIcon" />
         </AppButton>
       </div>
@@ -93,6 +96,9 @@ export default {
       padding: 5px;
       border-bottom-left-radius: 20px;
       h2 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
         margin-left: 10px;
         text-align: left;
         flex: 2;

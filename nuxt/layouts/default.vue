@@ -32,8 +32,11 @@ export default {
     getWorkspaceDetails() {
       const { ws } = this.$route.query
       if (ws) {
-        this.$store.dispatch("getWorkspaceDetails", ws)
+        this.$store.dispatch("getWorkspaceDetails", { ws: ws })
+        this.$store.dispatch("getFilters", ws)
+        this.$store.dispatch("getZones", ws)
         this.$store.dispatch("getMeta", ws)
+        this.$store.commit("resetZones")
       }
     }
   }

@@ -31,11 +31,14 @@ export default {
   /*
    ** Global CSS
    */
-  css: [{ src: "~/assets/scss/main.scss", lang: "scss" }],
+  css: [
+    { src: "~/assets/scss/main.scss", lang: "scss" },
+    { src: "vue-multiselect/dist/vue-multiselect.min.css", lang: "css" }
+  ],
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["~/plugins/vuetify", "~/plugins/axios"],
+  plugins: ["~/plugins/vuetify", "~/plugins/axios", "~/plugins/directives"],
   /*
    ** Nuxt.js dev-modules
    */

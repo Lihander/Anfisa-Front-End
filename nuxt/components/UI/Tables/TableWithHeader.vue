@@ -13,7 +13,7 @@
     <div v-show="tableCollapse" class="table__wrapper default-scroll">
       <div class="table__wrapper__content">
         <BaseTable v-if="tableData.type !== 'pre'" :data="tableData.data" />
-        <div class="varinat-content" v-else>
+        <div v-else class="varinat-content">
           <pre>{{ tableData.content }}</pre>
         </div>
       </div>

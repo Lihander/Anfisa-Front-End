@@ -1,25 +1,27 @@
 <template>
-  <div class="button-with-slot__wrapper">
-    <AppButton
-      class="slot__btn"
+  <div v-click-outside="hideSlot" class="button-with-slot">
+    <CollapseButton
+      style="z-index: 100"
+      :class="slotVisible ? 'hide-button' : ''"
       :btn-class="btnClass"
-      @click="$emit('change')"
-      @focus="slotVisible = true"
-      @blur="hideSlot"
-    >
-      <font-awesome-icon :icon="icon" />
-    </AppButton>
-    <div v-show="slotVisible" class="slot__wrapper">
+      :hide-class="hideClass"
+      :value="slotVisible"
+      :show-icon="showIcon"
+      :hide-icon="hideIcon"
+      @change="slotVisible = !slotVisible"
+    />
+    <div v-show="slotVisible" class="slot">
       <slot />
     </div>
   </div>
 </template>
 
 <script>
-import AppButton from "~/components/UI/Controls/Button.vue"
+import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
+
 export default {
   name: "ButtonWithSlot",
-  components: { AppButton },
+  components: { CollapseButton },
   props: {
     btnClass: {
       type: String,
@@ -27,9 +29,21 @@ export default {
         return "btnDefault"
       }
     },
-    icon: {
+    hideClass: {
+      type: String,
+      default: () => {
+        return "btnDanger"
+      }
+    },
+    showIcon: {
       type: Array,
       required: true
+    },
+    hideIcon: {
+      type: Array,
+      default: () => {
+        return ["fas", "times"]
+      }
     }
   },
   data() {
@@ -39,13 +53,30 @@ export default {
   },
   methods: {
     hideSlot() {
-      setTimeout(() => {
-        this.slotVisible = false
-      }, 200)
+      this.slotVisible = false
     }
   }
 }
 </script>
 
 <style lang="scss">
+.button-with-slot {
+  position: relative;
+  margin-top: 5px;
+  .btn {
+    transition: none;
+  }
+  .hide-button {
+    width: calc(100% + 10px);
+    border-radius: 20px 0 0 20px !important;
+    border-width: 5px !important;
+    border-right: none !important;
+  }
+  .slot {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 5px);
+    z-index: 99;
+  }
+}
 </style>

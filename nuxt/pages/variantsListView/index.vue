@@ -5,8 +5,7 @@
         <ViewToolbar>
           <AppButton
             slot="btns"
-            style="padding-right: 5px;"
-            class="buttons-list__button"
+            style="padding-right: 5px; margin-top: 5px;"
             btn-class="btnDefault"
             @click="updateShowAllNotes"
           >
@@ -75,6 +74,6 @@ export default {
   color: $success-color;
 }
 .red-eye {
-  color: $danger-color
+  color: $danger-color;
 }
 </style>

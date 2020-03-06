@@ -13,6 +13,8 @@ export default {
 <style lang="scss">
 .logo {
   height: 100%;
+  display: flex;
+  align-items: center;
   text-align: center;
   img {
     height: auto;

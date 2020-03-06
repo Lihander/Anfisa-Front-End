@@ -12,7 +12,13 @@ export const state = () => ({
   tags: [],
   isShowAllNotes: false,
   noteStatus: "",
-  meta: null
+  meta: null,
+  compiled: null,
+  zones: [],
+  selectedPreset: [],
+  presets: [],
+  presetsLoading: false,
+  stats: []
 })
 
 export const mutations = {
@@ -75,11 +81,46 @@ export const mutations = {
   setMeta(state, meta) {
     state.meta = meta
   },
+  setCompiled(state, compiled) {
+    state.compiled = compiled
+  },
+  setZone(state, payload) {
+    const zoneIndex = state.zones.findIndex(
+      zone => zone.zoneName === payload.zoneName
+    )
+    if (zoneIndex === -1) {
+      state.zones.push(payload)
+    } else {
+      state.zones[zoneIndex] = payload
+    }
+  },
+  setStats(state, stats) {
+    state.stats = stats
+  },
+  setSelectedPreset(state, selectedPreset) {
+    state.selectedPreset[0] = selectedPreset
+  },
+  setPresets(state, presets) {
+    state.presets = presets
+  },
+  setPresetsLoading(state, presetsLoading) {
+    state.presetsLoading = presetsLoading
+  },
   resetWorkspace(state) {
     state.variants = []
     state.totalVariants = 0
     state.filteredVariants = 0
     state.transcripts = []
+    state.selectedVariantId = ""
+  },
+  resetZones(state) {
+    state.zones = []
+  },
+  resetFilters(state) {
+    state.zones.forEach(zone => {
+      return (zone.selectedValues = [])
+    })
+    state.selectedPreset = []
   }
 }
 
@@ -104,11 +145,17 @@ export const actions = {
       })
       .catch(e => console.log(e))
   },
-  async getWorkspaceDetails({ commit }, selectedWorkspace) {
-    commit("setSelectedWorkspace", selectedWorkspace)
+  async getWorkspaceDetails({ commit }, payload) {
+    commit("setSelectedWorkspace", payload.ws)
     commit("resetWorkspace")
-    const params = new URLSearchParams()
-    params.append("ws", selectedWorkspace)
+    const selectedPreset = payload.selectedPreset
+    const zones = payload.zones
+
+    const params = utils.prepareParams({
+      ws: payload.ws,
+      filter: selectedPreset,
+      zones: zones
+    })
     await this.$axios
       .$post("/list", params)
       .then(res => {
@@ -225,6 +272,71 @@ export const actions = {
       .catch(error => {
         console.log(error)
       })
+  },
+
+  async getFilters({ commit }, selectedWorkspace) {
+    commit("setPresetsLoading", true)
+    const params = new URLSearchParams()
+    params.append("ws", selectedWorkspace)
+    const compiled = this.getters.getCompiled
+    if (compiled) {
+      params.append("compiled", JSON.stringify(compiled))
+    }
+    await this.$axios
+      .$post("/stat", params)
+      .then(response => {
+        const filterList = response["filter-list"]
+        if (filterList && Array.isArray(filterList)) {
+          const data = filterList.map(item => item[0])
+          commit("setPresets", [null, ...data])
+          commit("setPresetsLoading", false)
+        }
+        const statList = utils.getStatListWithOperativeStat(response)
+        commit("setStats", utils.prepareStatList(statList))
+        commit("setCompiled", response.compiled)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+
+  async getZones({ commit }, selectedWorkspace) {
+    const params = new URLSearchParams()
+    params.append("ws", selectedWorkspace)
+    await this.$axios
+      .$post("/zone_list", params)
+      .then(response => {
+        response.forEach(zone => {
+          commit("setZone", {
+            zoneName: zone[0],
+            zoneLoading: true,
+            selectedValues: [],
+            defaultValue: zone[1],
+            values: []
+          })
+          this.dispatch("getZoneData", { selectedWorkspace, zone })
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+
+  async getZoneData({ commit }, payload) {
+    const [zone, value] = payload.zone
+    const params = new URLSearchParams()
+    params.append("ws", payload.selectedWorkspace)
+    params.append("zone", zone)
+    await this.$axios.$post("/zone_list", params).then(response => {
+      const zoneData = {
+        zoneName: zone,
+        zoneLoading: false,
+        selectedValues: [],
+        defaultValue: value,
+        values: response.variants
+      }
+      commit("setZone", zoneData)
+    })
   }
 }
 
@@ -300,5 +412,20 @@ export const getters = {
   },
   getMeta(state) {
     return state.meta
+  },
+  getCompiled(state) {
+    return state.compiled
+  },
+  getZones(state) {
+    return state.zones
+  },
+  getSelectedPreset(state) {
+    return state.selectedPreset
+  },
+  getPresets(state) {
+    return state.presets
+  },
+  getPresetsLoading(state) {
+    return state.presetsLoading
   }
 }

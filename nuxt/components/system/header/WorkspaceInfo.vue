@@ -13,7 +13,7 @@
         v-show="getTotalVariants && getFilteredVariants"
         class="workspace-info__bottom-line__variants-count"
       >
-        <span>Variants:</span>{{ getTotalVariants }}/{{ getFilteredVariants }}
+        <span>Variants:</span>{{ getFilteredVariants }}/{{ getTotalVariants }}
       </div>
       <div
         v-show="getTranscripts.length > 0"

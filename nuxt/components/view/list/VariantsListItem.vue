@@ -240,7 +240,7 @@ export default {
     &__main {
       position: relative;
       width: 100%;
-      max-height: 5vh;
+      height: 5vh;
       &__tags-list {
         padding: 5px 10px;
         margin-left: 50px;

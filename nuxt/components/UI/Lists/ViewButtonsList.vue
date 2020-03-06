@@ -1,26 +1,23 @@
 <template>
-  <ButtonsList>
-    <div slot="btns" class="view-buttons__wrapper">
-      <AppButton
-        v-for="item in viewItems"
-        v-show="isInactiveViewItem(item)"
-        :key="item.view"
-        class="view-buttons__button"
-        btn-class="btnDefault"
-        @click="viewChange(item)"
-      >
-        <font-awesome-icon :icon="item.icon" />
-      </AppButton>
-    </div>
-  </ButtonsList>
+  <div class="view-buttons-list">
+    <AppButton
+      v-for="item in viewItems"
+      v-show="isInactiveViewItem(item)"
+      :key="item.view"
+      class="view-button"
+      btn-class="btnPrimaryWithoutBorder"
+      @click="viewChange(item)"
+    >
+      <font-awesome-icon :icon="item.icon" />
+    </AppButton>
+  </div>
 </template>
 
 <script>
 import AppButton from "~/components/UI/Controls/Button.vue"
-import ButtonsList from "~/components/UI/Lists/ButtonsList.vue"
 export default {
   name: "ViewButtonsList",
-  components: { ButtonsList, AppButton },
+  components: { AppButton },
   data() {
     return {
       showViews: false,
@@ -55,16 +52,19 @@ export default {
 </script>
 
 <style lang="scss">
-.view-buttons {
-  &__wrapper {
-    width: 100%;
-    padding: 5px 10px;
-    background-color: $secondary-color;
-    border: 1px solid $default-color;
-    border-radius: 5px;
-  }
-  &__button {
-    padding: 5px;
+.view-buttons-list {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: $default-color;
+  padding-left: 5px;
+  border: 5px solid $accent-color;
+  border-left: none;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  .view-button {
+    margin: 0 15px;
   }
 }
 </style>

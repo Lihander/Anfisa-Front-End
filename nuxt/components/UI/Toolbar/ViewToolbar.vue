@@ -1,59 +1,37 @@
 <template>
-  <ButtonsList>
-    <div slot="btns" class="buttons-list__wrapper">
-      <slot name="top-btns"></slot>
-      <ButtonWithSlot
-        class="buttons-list__button"
-        btn-class="btnDefault"
-        :icon="['fas', 'layer-group']"
-      >
-        <div class="view-buttons-list">
-          <ViewButtonsList />
-        </div>
+  <div class="view-toolbar">
+    <div class="buttons-list">
+      <slot name="top-btns" />
+      <ButtonWithSlot :show-icon="['fas', 'layer-group']">
+        <ViewButtonsList />
       </ButtonWithSlot>
-      <AppButton
-        class="buttons-list__button"
-        btn-class="btnDefault"
-        @click="$emit('showVariantsList')"
-      >
-        <font-awesome-icon :icon="['fas', 'filter']" />
-      </AppButton>
+      <ButtonWithSlot :show-icon="['fas', 'filter']">
+        <QuickFilterView />
+      </ButtonWithSlot>
       <slot name="btns"></slot>
     </div>
-  </ButtonsList>
+  </div>
 </template>
 
 <script>
-import AppButton from "~/components/UI/Controls/Button.vue"
-import ButtonsList from "~/components/UI/Lists/ButtonsList.vue"
 import ButtonWithSlot from "~/components/UI/Controls/ButtonWithSlot.vue"
 import ViewButtonsList from "~/components/UI/Lists/ViewButtonsList.vue"
+import QuickFilterView from "~/components/view/filter/QuickFilterView.vue"
 
 export default {
   name: "ViewToolbar",
   components: {
+    QuickFilterView,
     ViewButtonsList,
-    ButtonWithSlot,
-    ButtonsList,
-    AppButton
+    ButtonWithSlot
   }
 }
 </script>
 
 <style lang="scss">
 .buttons-list {
-  &__wrapper {
-    width: 100%;
-  }
-  &__button {
-    position: relative;
-    margin-bottom: 5px;
-    width: 100%;
-  }
-}
-.view-buttons-list {
-  position: absolute;
-  top: -5px;
-  right: -70px;
+  width: 100%;
+  margin: 5px;
+  font-size: 24px;
 }
 </style>

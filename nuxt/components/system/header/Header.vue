@@ -152,6 +152,9 @@ header {
     width: 100%;
     &__logo {
       height: 70%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     &__info {
       height: 30%;

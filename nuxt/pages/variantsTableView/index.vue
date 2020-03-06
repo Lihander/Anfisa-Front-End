@@ -6,16 +6,19 @@
         <ViewToolbar>
           <CollapseButton
             slot="top-btns"
-            class="buttons-list__button"
             btn-class="btnSecondary"
             :value="isVariantsListShow"
             :show-icon="showVariantsListButtonIcon"
             :hide-icon="hideVariantsListButtonIcon"
             @change="isVariantsListShow = !isVariantsListShow"
           />
-          <div slot="btns" class="bottom-btns">
-            <NoteView v-if="isVariantSelected" />
-          </div>
+          <ButtonWithSlot
+            v-if="isVariantSelected"
+            slot="btns"
+            :show-icon="['fas', 'clipboard']"
+          >
+            <NoteView />
+          </ButtonWithSlot>
         </ViewToolbar>
       </div>
       <VariantsTables v-if="isVariantSelected" />
@@ -29,13 +32,15 @@ import VariantsTables from "~/components/view/table/VariantsTables.vue"
 import ViewToolbar from "~/components/UI/Toolbar/ViewToolbar.vue"
 import CollapseButton from "~/components/UI/Controls/CollapseButton.vue"
 import NoteView from "~/components/view/table/NoteView.vue"
+import ButtonWithSlot from "~/components/UI/Controls/ButtonWithSlot.vue"
 export default {
   components: {
     NoteView,
     ViewToolbar,
     VariantsTables,
     VariantsListPanel,
-    CollapseButton
+    CollapseButton,
+    ButtonWithSlot
   },
   data() {
     return {

@@ -33,6 +33,7 @@ export default {
   },
   watch: {
     variants() {
+      this.resetList()
       this.updateVariants()
     }
   },
@@ -60,6 +61,11 @@ export default {
       this.oldListLength = this.listLength
       this.listLength = newLength
       this.updateVariants()
+    },
+    resetList() {
+      this.oldListLength = 0
+      this.listLength = 10
+      this.slicedVariants = []
     }
   }
 }

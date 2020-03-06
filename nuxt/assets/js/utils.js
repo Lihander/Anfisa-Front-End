@@ -1,3 +1,40 @@
+import {
+  STAT_TYPE_ENUM,
+  STAT_TYPE_STATUS,
+  STAT_TYPE_INT,
+  STAT_TYPE_FLOAT,
+  STAT_GROUP,
+  STAT_TYPE_ZYGOSITY,
+  STAT_TYPE_TRANSCRIPT_MULTISET,
+  STAT_TYPE_TRANSCRIPT_STATUS,
+  NUMERIC_RENDER_TYPES,
+  STAT_TYPES
+} from "./constants"
+
+export function prepareParams({ ws, filter, conditions, zones }) {
+  const params = new URLSearchParams()
+  if (ws) {
+    params.append("ws", ws)
+  }
+  if (filter) {
+    params.append("filter", filter)
+  }
+  if (conditions && conditions.length) {
+    params.append("conditions", JSON.stringify(conditions))
+  }
+  if (zones) {
+    zones.forEach(zone => {
+      if (zone.selectedValues.length !== 0) {
+        params.append(
+          "zone",
+          JSON.stringify([zone.zoneName, zone.selectedValues])
+        )
+      }
+    })
+  }
+  return params
+}
+
 export function prepareVariantDetails(data) {
   const result = {}
   const getValuesForRow = row =>
@@ -45,3 +82,115 @@ export function getDataFromTableByName(table, name) {
   }
   return null
 }
+
+export function getStatListWithOperativeStat(data) {
+  const statsToAdd = (data && data["avail-import"]) || []
+  let statList = data["stat-list"]
+  if (statList && Array.isArray(statList)) {
+    statsToAdd.forEach((statToAdd, index) => {
+      const dubbedHetStat = statList.findIndex(
+        statItem => statItem[1].name === statToAdd
+      )
+      if (dubbedHetStat === -1) {
+        const target = [
+          STAT_TYPE_ENUM,
+          {
+            vgroup: "Inheritance",
+            name: statToAdd,
+            render: "operative",
+            title: data["avail-import-titles"]
+              ? data["avail-import-titles"][index]
+              : ""
+          },
+          [["Proband", null]]
+        ]
+        statList = [...statList, target]
+      }
+    })
+  }
+  return statList
+}
+
+export function prepareStatList(statList) {
+  const tmpResult = []
+  const groupsData = {}
+
+  if (statList && Array.isArray(statList)) {
+    statList
+      .filter(statItem => STAT_TYPES.includes(statItem[0]))
+      .forEach(statItem => {
+        const groupName = statItem[1].vgroup
+        if (groupName) {
+          if (!Object.keys(groupsData).includes(groupName)) {
+            tmpResult.push({
+              title: groupName,
+              type: STAT_GROUP
+            })
+            groupsData[groupName] = []
+          }
+          groupsData[groupName].push(prepareStatDataByType(statItem))
+        } else {
+          const data = prepareStatDataByType(statItem)
+          tmpResult.push({ ...data, title: data.name })
+        }
+      })
+  }
+
+  return tmpResult.map(item => {
+    if (item.type === STAT_GROUP) {
+      return {
+        ...item,
+        data: groupsData[item.title]
+      }
+    }
+    return item
+  })
+}
+
+export const prepareStatDataByType = statItem => {
+  switch (statItem[0]) {
+    case STAT_TYPE_INT:
+    case STAT_TYPE_FLOAT:
+      return prepareNumericStatData(statItem)
+    case STAT_TYPE_ENUM:
+    case STAT_TYPE_STATUS:
+    case STAT_TYPE_TRANSCRIPT_MULTISET:
+    case STAT_TYPE_TRANSCRIPT_STATUS:
+      return prepareEnumStatData(statItem)
+    case STAT_TYPE_ZYGOSITY:
+      return prepareZygosityStatData(statItem)
+    default:
+      return null
+  }
+}
+
+const prepareNumericStatData = statItem => ({
+  type: statItem[0],
+  name: statItem[1].name,
+  title: statItem[1].title,
+  tooltip: statItem[1].tooltip,
+  render: statItem[1].render
+    ? statItem[1].render.split(",")[0]
+    : NUMERIC_RENDER_TYPES.LINEAR,
+  data: statItem.splice(2)
+})
+
+const prepareEnumStatData = statItem => ({
+  type: statItem[0],
+  name: statItem[1].name,
+  title: statItem[1].title,
+  tooltip: statItem[1].tooltip,
+  data: statItem[2],
+  render: statItem[1].render
+})
+
+const prepareZygosityStatData = statItem => ({
+  type: statItem[0],
+  name: statItem[1].name,
+  title: statItem[1].title,
+  data: {
+    family: statItem[1].family,
+    selectedFamily: statItem[2],
+    variants: statItem[3]
+  }
+})
