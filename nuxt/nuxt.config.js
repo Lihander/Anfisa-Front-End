@@ -38,7 +38,12 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: ["~/plugins/vuetify", "~/plugins/axios", "~/plugins/directives"],
+  plugins: [
+    "~/plugins/vuetify",
+    "~/plugins/axios",
+    "~/plugins/directives",
+    "~/plugins/vue-slider"
+  ],
   /*
    ** Nuxt.js dev-modules
    */

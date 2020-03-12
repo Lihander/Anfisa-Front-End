@@ -84,7 +84,7 @@ export default {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    z-index: 1000;
+    z-index: 1;
     &__info {
       height: 100%;
       width: 50%;

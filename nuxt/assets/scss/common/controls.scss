@@ -13,3 +13,21 @@ textarea {
 input, textarea {
   width: 100%;
 }
+input[type="text"] {
+  border-bottom: 1px solid $primary-color;
+  font-size: 16px;
+  padding: 5px 5px 0 5px;
+  &::placeholder {
+    color: $neutral-placeholder;
+  }
+}
+input[type="number"] {
+  background-color: $border-lightex;
+  border: 1px solid $border-light;
+  border-radius: 5px;
+  font-size: 14px;
+  padding: 2px 5px;
+  &::placeholder {
+    color: $neutral-placeholder;
+  }
+}

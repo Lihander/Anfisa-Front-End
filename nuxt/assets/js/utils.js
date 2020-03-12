@@ -8,7 +8,8 @@ import {
   STAT_TYPE_TRANSCRIPT_MULTISET,
   STAT_TYPE_TRANSCRIPT_STATUS,
   NUMERIC_RENDER_TYPES,
-  STAT_TYPES
+  STAT_TYPES,
+  RENDER_OPERATIVE
 } from "./constants"
 
 export function prepareParams({ ws, filter, conditions, zones }) {
@@ -97,7 +98,7 @@ export function getStatListWithOperativeStat(data) {
           {
             vgroup: "Inheritance",
             name: statToAdd,
-            render: "operative",
+            render: RENDER_OPERATIVE,
             title: data["avail-import-titles"]
               ? data["avail-import-titles"][index]
               : ""
@@ -162,6 +163,26 @@ export const prepareStatDataByType = statItem => {
     default:
       return null
   }
+}
+
+export function checkStatByQuery(stat, query = "") {
+  if (stat.name.toLowerCase().includes(query.toLowerCase())) {
+    return true
+  } else if (stat.type === STAT_TYPE_ENUM || stat.type === STAT_TYPE_STATUS) {
+    return stat.data.some(item =>
+      item[0].toLowerCase().includes(query.toLowerCase())
+    )
+  } else if (stat.type === STAT_TYPE_ZYGOSITY) {
+    return (
+      stat.data.family.some(item =>
+        item.toLowerCase().includes(query.toLowerCase())
+      ) ||
+      stat.data.variants.some(item =>
+        item[0].toLowerCase().includes(query.toLowerCase())
+      )
+    )
+  }
+  return false
 }
 
 const prepareNumericStatData = statItem => ({

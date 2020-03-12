@@ -1,7 +1,7 @@
 <template>
   <div v-click-outside="hideSlot" class="button-with-slot">
     <CollapseButton
-      style="z-index: 100"
+      style="z-index: 1"
       :class="slotVisible ? 'hide-button' : ''"
       :btn-class="btnClass"
       :hide-class="hideClass"
@@ -63,6 +63,7 @@ export default {
 .button-with-slot {
   position: relative;
   margin-top: 5px;
+  z-index: 100;
   .btn {
     transition: none;
   }
@@ -76,7 +77,6 @@ export default {
     position: absolute;
     top: 0;
     left: calc(100% + 5px);
-    z-index: 99;
   }
 }
 </style>

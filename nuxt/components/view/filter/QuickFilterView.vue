@@ -32,8 +32,12 @@
       </div>
     </div>
     <div class="footer">
-      <AppButton class="footer__btn" :btn-class="'btnPrimary'">
-        CUSTOM FILTER
+      <AppButton
+        class="footer__btn"
+        :btn-class="'btnPrimary'"
+        @click="showVariantsFilter = true"
+      >
+        {{ variantsFilterTitle }}
       </AppButton>
     </div>
   </div>
@@ -42,6 +46,7 @@
 <script>
 import AppButton from "~/components/UI/Controls/Button.vue"
 import AppMultiselect from "~/components/UI/Controls/Multiselect.vue"
+import { VARIANTS_FILTER_TITLE } from "~/assets/js/constants.js"
 
 export default {
   name: "QuickFilterView",
@@ -55,6 +60,14 @@ export default {
     }
   },
   computed: {
+    showVariantsFilter: {
+      get() {
+        return this.$store.getters.getShowVariantsFilter
+      },
+      set(value) {
+        this.$store.commit("setShowVariantsFilter", value)
+      }
+    },
     presets() {
       const presets = this.$store.getters.getPresets
       return presets.map(preset => {
@@ -72,6 +85,9 @@ export default {
     },
     zones() {
       return this.$store.getters.getZones
+    },
+    variantsFilterTitle() {
+      return VARIANTS_FILTER_TITLE
     }
   },
   methods: {

@@ -1,4 +1,11 @@
+import Vue from "vue"
 import * as utils from "../assets/js/utils.js"
+import {
+  STAT_GROUP,
+  STAT_TYPE_ENUM,
+  STAT_TYPE_ZYGOSITY,
+  STAT_NUMERIC
+} from "../assets/js/constants.js"
 
 export const state = () => ({
   workspaces: [],
@@ -18,7 +25,10 @@ export const state = () => ({
   selectedPreset: [],
   presets: [],
   presetsLoading: false,
-  stats: []
+  stats: [],
+  showVariantsFilter: false,
+  currentConditions: [],
+  nonzeroOnly: true
 })
 
 export const mutations = {
@@ -106,6 +116,55 @@ export const mutations = {
   setPresetsLoading(state, presetsLoading) {
     state.presetsLoading = presetsLoading
   },
+  setShowVariantsFilter(state, isShow) {
+    state.showVariantsFilter = isShow
+  },
+  setAllCurrentConditions(state, conditions) {
+    state.currentConditions = conditions
+  },
+  setCurrentConditions(state, condition) {
+    const index = state.currentConditions.findIndex(
+      item => item[1] === condition[1] && item[0] === condition[0]
+    )
+    if (index === -1) {
+      state.currentConditions.push(condition)
+    } else {
+      const conditionFixed = JSON.parse(JSON.stringify(condition))
+      if (condition[0] === STAT_TYPE_ENUM) {
+        ;[, , conditionFixed[2]] = state.currentConditions[index]
+      }
+      if (condition[0] === STAT_TYPE_ZYGOSITY) {
+        ;[, , , conditionFixed[3]] = state.currentConditions[index]
+      }
+      Vue.set(state.currentConditions, index, conditionFixed)
+    }
+  },
+  setZygosityByName(state, payload) {
+    let stats = state.stats
+    const units = payload.units[0]
+    if (units[1].vgroup) {
+      const targetGroup = stats.find(
+        item => item.title === units[1].vgroup && item.type === STAT_GROUP
+      )
+      stats = targetGroup.data
+    }
+    const targetItemIndex = stats.findIndex(item => item.name === units[1].name)
+    Vue.set(stats, targetItemIndex, utils.prepareStatDataByType(units))
+  },
+  setNonzeroOnly(state, nonzeroOnly) {
+    state.nonzeroOnly = nonzeroOnly
+  },
+  removeConditionsByIndex(state, index) {
+    state.currentConditions.splice(index, 1)
+  },
+  removeConditionsItemByIndex(state, payload) {
+    const condition = state.currentConditions[payload.conditionIndex]
+    let index = 3
+    if (condition[0] === STAT_TYPE_ZYGOSITY) {
+      index = 4
+    }
+    condition[index].splice(payload.index, 1)
+  },
   resetWorkspace(state) {
     state.variants = []
     state.totalVariants = 0
@@ -121,6 +180,14 @@ export const mutations = {
       return (zone.selectedValues = [])
     })
     state.selectedPreset = []
+  },
+  resetConditionsByName(state, name) {
+    const index = state.currentConditions.findIndex(
+      condition => condition[1] === name
+    )
+    if (index !== -1) {
+      state.currentConditions.splice(index, 1)
+    }
   }
 }
 
@@ -322,6 +389,25 @@ export const actions = {
       })
   },
 
+  async updateZygosityByName({ commit }, { family, name }) {
+    const currentConditions = this.getters.getCurrentConditions
+    const params = new URLSearchParams()
+    params.append("ws", this.getters.getSelectedWorkspace)
+    params.append("units", JSON.stringify([name]))
+    params.append("ctx", JSON.stringify({ problem_group: family }))
+    if (currentConditions.length) {
+      params.append("conditions", JSON.stringify(currentConditions))
+    }
+    await this.$axios
+      .$post("/statunits", params)
+      .then(response => {
+        commit("setZygosityByName", response)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+
   async getZoneData({ commit }, payload) {
     const [zone, value] = payload.zone
     const params = new URLSearchParams()
@@ -427,5 +513,75 @@ export const getters = {
   },
   getPresetsLoading(state) {
     return state.presetsLoading
+  },
+  getShowVariantsFilter(state) {
+    return state.showVariantsFilter
+  },
+  getStats(state) {
+    return state.stats
+  },
+  getFilteredStats(state) {
+    return searchQuery => {
+      const result = []
+      state.stats.forEach(stat => {
+        let subResult
+        if (stat.type === STAT_GROUP) {
+          if (stat.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+            subResult = stat
+          } else {
+            const data = stat.data.filter(subStat =>
+              utils.checkStatByQuery(subStat, searchQuery)
+            )
+            subResult = { ...stat, data }
+          }
+        } else {
+          subResult = utils.checkStatByQuery(stat, searchQuery)
+            ? stat
+            : { ...stat, type: STAT_GROUP, data: [] }
+        }
+        result.push(subResult)
+      })
+      return result
+    }
+  },
+  getCurrentConditionsArray(state) {
+    return state.currentConditions
+  },
+  getCurrentConditions(state) {
+    const result = []
+    state.currentConditions.forEach(condition => {
+      if (condition[0] === STAT_TYPE_ZYGOSITY) {
+        const [type, name, family, , variants] = condition
+        result[name] = {
+          type,
+          family,
+          variants
+        }
+      } else {
+        const [type, name, data, list] = condition
+        result[name] = {
+          type,
+          data,
+          list
+        }
+      }
+    })
+    return result
+  },
+  getConditionsByName: state => name => {
+    return state.currentConditions.find(condition => {
+      if (condition[1] === name) {
+        if (condition[0] === STAT_TYPE_ENUM) {
+          return condition[3]
+        } else if (condition[0] === STAT_TYPE_ZYGOSITY) {
+          return condition[4]
+        } else if (condition[0] === STAT_NUMERIC) {
+          return condition[2]
+        }
+      }
+    })
+  },
+  getNonzeroOnly(state) {
+    return state.nonzeroOnly
   }
 }

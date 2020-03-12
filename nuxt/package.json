@@ -22,7 +22,8 @@
     "@nuxtjs/style-resources": "^1.0.0",
     "dotenv": "^8.2.0",
     "nuxt": "^2.0.0",
-    "nuxt-fontawesome": "^0.4.0"
+    "nuxt-fontawesome": "^0.4.0",
+    "vue-slider-component": "^3.1.1"
   },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.12.0",

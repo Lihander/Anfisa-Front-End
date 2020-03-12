@@ -61,9 +61,6 @@ export default {
 .view-toolbar-wrapper {
   width: 4%;
 }
-.buttons-list__button {
-  z-index: 1000;
-}
 .sticker {
   position: absolute;
   top: 2px;

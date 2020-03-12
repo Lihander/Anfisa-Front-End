@@ -1,14 +1,6 @@
 <template>
   <div class="tags-list">
-    <div class="tags-list__search">
-      <font-awesome-icon :icon="searchIcon" class="tags-list__search__icon" />
-      <input
-        v-model="search"
-        type="text"
-        name="search"
-        placeholder="Search in Tags"
-      />
-    </div>
+    <SearchLine v-model="search" :placeholder="searchPlaceholder" />
     <TagButton
       v-for="(tag, index) in getNotSelectedTags"
       :key="index"
@@ -22,14 +14,15 @@
 
 <script>
 import TagButton from "~/components/UI/Controls/TagButton.vue"
+import SearchLine from "~/components/UI/Controls/SearchLine.vue"
 export default {
   name: "AddTagView",
-  components: { TagButton },
+  components: { SearchLine, TagButton },
   data() {
     return {
       search: "",
       addTagIcon: ["fas", "plus"],
-      searchIcon: ["fas", "search"]
+      searchPlaceholder: "Search in Tags"
     }
   },
   computed: {
@@ -81,25 +74,6 @@ export default {
     width: unset;
     display: inline-block;
     margin-bottom: 5px;
-  }
-  &__search {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    width: 100%;
-    input[type="text"] {
-      border-bottom: 1px solid $primary-color;
-      font-size: 14px;
-      background-color: $default-color;
-      padding: 5px;
-      &::placeholder {
-        color: $neutral-placeholder;
-      }
-    }
-    &__icon {
-      color: $primary-color;
-      margin-right: 5px;
-    }
   }
 }
 </style>

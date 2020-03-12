@@ -5,9 +5,12 @@
         <!-- header -->
         <div class="modal-header">
           <span class="modal-title"> {{ title }} </span>
-          <span class="button-close" @click="$emit('close')">
-            <font-awesome-icon :icon="['fas', 'times']" />
-          </span>
+          <div class="header-buttons">
+            <slot name="header-buttons" />
+            <span class="button-close" @click="$emit('close')">
+              <font-awesome-icon :icon="['fas', 'times']" />
+            </span>
+          </div>
         </div>
 
         <!-- body -->
@@ -16,7 +19,7 @@
         </div>
 
         <!-- footer -->
-        <div class="modal-footer">
+        <div v-if="showFooter" class="modal-footer">
           <slot name="footer">
             <AppButton class="btnPrimary" @click="$emit('close')">
               OK
@@ -38,6 +41,12 @@ export default {
     title: {
       type: String,
       required: true
+    },
+    showFooter: {
+      type: Boolean,
+      default() {
+        return true
+      }
     }
   },
   computed: {},
@@ -69,11 +78,12 @@ export default {
 
 .modal-content {
   position: relative;
-  max-width: 80%;
-  height: 80%;
+  max-width: 80vw;
+  height: 75vh;
   background-color: $default-color;
   transition: all 0.2s ease;
   border-radius: 8px;
+  overflow: hidden;
   z-index: 999;
   @media screen and (min-width: 900px) {
     min-width: 500px;
@@ -88,15 +98,27 @@ export default {
   color: $default-color;
   background-color: $secondary-color;
   border-bottom: 1px solid $primary-color;
-  span {
-    font-size: 24px;
+  .modal-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-  .button-close {
-    cursor: pointer;
-    color: $default-color;
-    transition: all 0.3s ease;
-    &:hover {
-      color: $neutral-secondary;
+  span {
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .header-buttons {
+    display: flex;
+    align-self: center;
+    justify-content: flex-end;
+    .button-close {
+      margin-left: 30px;
+      cursor: pointer;
+      color: $default-color;
+      transition: all 0.3s ease;
+      &:hover {
+        color: $neutral-secondary;
+      }
     }
   }
 }
