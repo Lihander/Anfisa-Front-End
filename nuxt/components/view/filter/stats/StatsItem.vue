@@ -15,8 +15,7 @@
     <LinearItem
       v-else-if="isLinear"
       :is-simple="isSimple"
-      :is-int="isInt"
-      :step="isInt ? 1 : 0.001"
+      :step="step"
       :stat="stat"
       :button-text="buttonText"
       :selected="selected"
@@ -128,6 +127,19 @@ export default {
         this.stat.name
       )
       return currentConditions ? "UPDATE" : "ADD"
+    },
+    step() {
+      if (!this.isInt) {
+        const min = this.stat.data[0].toString()
+        const minDecimal =
+          min.indexOf(".") !== -1 ? min.split(".")[1].length : 0
+        const max = this.stat.data[1].toString()
+        const maxDecimal =
+          max.indexOf(".") !== -1 ? max.split(".")[1].length : 0
+        const decimal = minDecimal > maxDecimal ? minDecimal : maxDecimal
+        return decimal === 0 ? 1 : 1 / Math.pow(10, decimal)
+      }
+      return 1
     }
   }
 }

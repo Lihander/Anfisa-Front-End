@@ -44,16 +44,22 @@ export default {
       default() {
         return ["fas", "caret-square-up"]
       }
+    },
+    collapse: {
+      type: Boolean,
+      default() {
+        return false
+      }
     }
   },
   data() {
     return {
-      collapseGroup: false
+      collapseGroup: this.collapse
     }
   },
   computed: {
     getCollapseGroup() {
-      return this.collapseGroup
+      return this.collapseGroup || this.collapse
     },
     getCollapsedClass() {
       return this.getCollapseGroup ? "active" : ""

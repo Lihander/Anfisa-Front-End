@@ -1,16 +1,25 @@
 <template>
   <div class="variant-filter-second-header">
     <div class="filter-info">
-      <div class="filter-status">
-        New Filter
+      <div class="filter-info__apply">
+        <AppButton
+          class="second-header-button"
+          :btn-class="'btnAccent'"
+          :disabled="activeFilters === 0"
+          @click="applyConditions"
+        >
+          <font-awesome-icon :icon="['fas', 'check-circle']" />
+          <span>Apply Filter</span>
+        </AppButton>
       </div>
       <div class="v-separator"></div>
-      <div class="filter-counter">
+      <div class="filter-info__counter">
         <span>{{ activeFilters }}</span>
         {{ activeFilterLabel }}
       </div>
-      <div class="clear-btn">
+      <div class="filter-info__clear">
         <AppButton
+          class="second-header-button"
           :btn-class="'btnDanger'"
           :disabled="activeFilters === 0"
           @click="clearAllConditions"
@@ -21,11 +30,19 @@
       </div>
     </div>
     <div class="save-load-btns">
-      <AppButton :btn-class="'btnSuccess'" :disabled="activeFilters === 0">
+      <AppButton
+        class="second-header-button"
+        :btn-class="'btnSuccess'"
+        :disabled="activeFilters === 0"
+      >
         <font-awesome-icon :icon="['fas', 'save']" />
         <span>Save</span>
       </AppButton>
-      <AppButton :btn-class="'btnAccent'">
+      <AppButton
+        class="second-header-button"
+        :btn-class="'btnAccent'"
+        @click="$emit('showLoadView')"
+      >
         <font-awesome-icon :icon="['fas', 'folder']" />
         <span>Load</span>
       </AppButton>
@@ -52,6 +69,15 @@ export default {
   methods: {
     clearAllConditions() {
       this.$store.commit("setAllCurrentConditions", [])
+    },
+    applyConditions() {
+      this.$store.dispatch("getWorkspaceDetails", {
+        ws: this.$store.getters.getSelectedWorkspace,
+        selectedPreset: this.$store.getters.getSelectedPreset,
+        zones: this.$store.getters.getZones,
+        conditions: this.$store.getters.getCurrentConditionsArray
+      })
+      this.$store.commit("setShowVariantsFilter", false)
     }
   }
 }
@@ -81,8 +107,7 @@ export default {
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    .filter-status {
-      width: 50%;
+    &__apply {
       overflow: hidden;
       text-overflow: ellipsis;
       padding: 5px 20px;
@@ -92,19 +117,10 @@ export default {
       width: 1px;
       border-right: 1px dotted $neutral-placeholder;
     }
-    .filter-counter {
+    &__counter {
       padding: 5px 20px;
       span {
         font-weight: 800;
-      }
-    }
-    .clear-btn {
-      width: 150px;
-      margin: 0 10px;
-      button[disabled] {
-        border: 1px solid $secondary-color;
-        background-color: $secondary-color;
-        color: $primary-color;
       }
     }
   }
@@ -114,15 +130,18 @@ export default {
     justify-content: flex-end;
     align-items: center;
     margin: 0 20px;
-    .btn {
-      width: 110px;
-      margin: 0 10px;
-    }
-    button[disabled] {
-      border: 1px solid $secondary-color;
-      background-color: $secondary-color;
-      color: $primary-color;
-    }
+  }
+  .second-header-button {
+    width: 150px;
+    margin: 0 10px;
+  }
+  button[disabled],
+  button[disabled]:hover,
+  button[disabled]:focus,
+  button[disabled]:active {
+    border: 1px solid $secondary-color;
+    background-color: $secondary-color;
+    color: $primary-color;
   }
 }
 </style>

@@ -29,7 +29,7 @@ import Header from "~/components/system/header/Header.vue"
 import BaseModal from "~/components/UI/Modals/BaseModal.vue"
 import AppButton from "~/components/UI/Controls/Button.vue"
 import VariantsFilter from "~/components/view/filter/VariantsFilter"
-import { VARIANTS_FILTER_TITLE } from "~/assets/js/constants.js"
+import { isEqual } from "~/assets/js/utils.js"
 
 export default {
   components: { Header, BaseModal, AppButton, VariantsFilter },
@@ -46,7 +46,22 @@ export default {
       }
     },
     variantsFilterTitle() {
-      return VARIANTS_FILTER_TITLE
+      let title = "New Filter"
+      const selectedPreset = this.$store.getters.getSelectedPreset
+      const conditions = this.$store.getters.getCurrentConditionsArray
+      const loadedConditions = this.$store.getters.getLoadedConditions
+      if (selectedPreset.length > 0) {
+        title = selectedPreset
+      }
+      if (
+        (loadedConditions &&
+          loadedConditions.length > 0 &&
+          !isEqual(conditions, loadedConditions())) ||
+        conditions.length > 0
+      ) {
+        title += " - Unsaved"
+      }
+      return title
     }
   },
   watch: {

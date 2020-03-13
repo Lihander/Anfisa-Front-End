@@ -17,7 +17,7 @@ export function prepareParams({ ws, filter, conditions, zones }) {
   if (ws) {
     params.append("ws", ws)
   }
-  if (filter) {
+  if (filter && filter.length > 0) {
     params.append("filter", filter)
   }
   if (conditions && conditions.length) {
@@ -165,7 +165,7 @@ export const prepareStatDataByType = statItem => {
   }
 }
 
-export function checkStatByQuery(stat, query = "") {
+export function checkStatByQuery(stat, query) {
   if (stat.name.toLowerCase().includes(query.toLowerCase())) {
     return true
   } else if (stat.type === STAT_TYPE_ENUM || stat.type === STAT_TYPE_STATUS) {
@@ -183,6 +183,22 @@ export function checkStatByQuery(stat, query = "") {
     )
   }
   return false
+}
+
+export function isEqual(a, b) {
+  const aProps = Object.getOwnPropertyNames(a)
+  const bProps = Object.getOwnPropertyNames(b)
+  if (aProps.length != bProps.length) {
+    return false
+  }
+
+  for (let i = 0; i < aProps.length; i++) {
+    const propName = aProps[i]
+    if (a[propName] !== b[propName]) {
+      return false
+    }
+  }
+  return true
 }
 
 const prepareNumericStatData = statItem => ({

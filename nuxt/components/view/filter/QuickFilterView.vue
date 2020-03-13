@@ -65,6 +65,9 @@ export default {
         return this.$store.getters.getShowVariantsFilter
       },
       set(value) {
+        if (value) {
+          this.$emit("close")
+        }
         this.$store.commit("setShowVariantsFilter", value)
       }
     },
@@ -74,7 +77,7 @@ export default {
         if (!preset) {
           return ""
         }
-        return preset
+        return preset[0]
       })
     },
     presetsLoading() {

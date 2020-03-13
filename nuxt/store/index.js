@@ -28,6 +28,7 @@ export const state = () => ({
   stats: [],
   showVariantsFilter: false,
   currentConditions: [],
+  loadedConditions: [],
   nonzeroOnly: true
 })
 
@@ -116,11 +117,23 @@ export const mutations = {
   setPresetsLoading(state, presetsLoading) {
     state.presetsLoading = presetsLoading
   },
+  setPresetConditionsByName(state, payload) {
+    const preset = state.presets.find(item => {
+      if (item) {
+        return item[0] === payload.filter
+      }
+      return false
+    })
+    preset.push(payload.conditions)
+  },
   setShowVariantsFilter(state, isShow) {
     state.showVariantsFilter = isShow
   },
   setAllCurrentConditions(state, conditions) {
     state.currentConditions = conditions
+  },
+  setLoadedConditions(state, loadedConditions) {
+    state.loadedConditions = loadedConditions
   },
   setCurrentConditions(state, condition) {
     const index = state.currentConditions.findIndex(
@@ -217,11 +230,13 @@ export const actions = {
     commit("resetWorkspace")
     const selectedPreset = payload.selectedPreset
     const zones = payload.zones
+    const conditions = payload.conditions
 
     const params = utils.prepareParams({
       ws: payload.ws,
       filter: selectedPreset,
-      zones: zones
+      zones: zones,
+      conditions: conditions
     })
     await this.$axios
       .$post("/list", params)
@@ -242,6 +257,9 @@ export const actions = {
         commit("setTotalVariants", res.total)
         commit("setFilteredVariants", res.filtered)
         commit("setTranscripts", res.transcripts)
+        if (selectedPreset && selectedPreset.length > 0) {
+          commit("setSelectedPreset", selectedPreset)
+        }
       })
       .catch(e => console.log(e))
   },
@@ -354,13 +372,34 @@ export const actions = {
       .then(response => {
         const filterList = response["filter-list"]
         if (filterList && Array.isArray(filterList)) {
-          const data = filterList.map(item => item[0])
-          commit("setPresets", [null, ...data])
+          commit("setPresets", [null, ...filterList])
           commit("setPresetsLoading", false)
         }
         const statList = utils.getStatListWithOperativeStat(response)
         commit("setStats", utils.prepareStatList(statList))
         commit("setCompiled", response.compiled)
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+
+  async getConditionsByFilter({ commit }, { ws, filter }) {
+    commit("setPresetsLoading", true)
+    const params = new URLSearchParams()
+    params.append("ws", ws)
+    params.append("filter", filter)
+    const compiled = this.getters.getCompiled
+    if (compiled) {
+      params.append("compiled", JSON.stringify(compiled))
+    }
+    await this.$axios
+      .$post("/stat", params)
+      .then(response => {
+        commit("setPresetConditionsByName", {
+          filter: filter,
+          conditions: response.conditions
+        })
       })
       .catch(error => {
         console.log(error)
@@ -514,6 +553,23 @@ export const getters = {
   getPresetsLoading(state) {
     return state.presetsLoading
   },
+  getPresetByName(state) {
+    return name => {
+      const presets = state.presets.slice(1)
+      const findedPreset = presets.find(preset => {
+        if (preset) {
+          return preset[0] === name
+        }
+        return false
+      })
+      return {
+        name: findedPreset[0],
+        isCommon: findedPreset[1],
+        date: findedPreset[3],
+        conditions: findedPreset[4]
+      }
+    }
+  },
   getShowVariantsFilter(state) {
     return state.showVariantsFilter
   },
@@ -522,30 +578,27 @@ export const getters = {
   },
   getFilteredStats(state) {
     return searchQuery => {
-      const result = []
-      state.stats.forEach(stat => {
-        let subResult
+      return state.stats.filter(stat => {
         if (stat.type === STAT_GROUP) {
-          if (stat.title.toLowerCase().includes(searchQuery.toLowerCase())) {
-            subResult = stat
-          } else {
-            const data = stat.data.filter(subStat =>
-              utils.checkStatByQuery(subStat, searchQuery)
-            )
-            subResult = { ...stat, data }
-          }
+          const statIncluded = stat.title
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())
+          return statIncluded
+            ? statIncluded
+            : stat.data.some(subStat =>
+                utils.checkStatByQuery(subStat, searchQuery)
+              )
         } else {
-          subResult = utils.checkStatByQuery(stat, searchQuery)
-            ? stat
-            : { ...stat, type: STAT_GROUP, data: [] }
+          return utils.checkStatByQuery(stat, searchQuery)
         }
-        result.push(subResult)
       })
-      return result
     }
   },
   getCurrentConditionsArray(state) {
     return state.currentConditions
+  },
+  getLoadedConditions(state) {
+    return state.loadedConditions
   },
   getCurrentConditions(state) {
     const result = []

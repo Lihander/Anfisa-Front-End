@@ -26,7 +26,7 @@
     </div>
     <div class="stats">
       <div v-for="stat in stats" :key="stat.name" class="stats-item">
-        <GroupList :group="stat.title || stat.name">
+        <GroupList :group="stat.title || stat.name" :collapse="collapseAll">
           <div slot="preTitleControls">
             <BaseCheckbox
               :checked="hasCurrentConditions(stat)"
@@ -41,6 +41,7 @@
                 :group="subStat.title || subStat.name"
                 :show-icon="groupShowIcon"
                 :hide-icon="groupHideIcon"
+                :collapse="collapseAll"
               >
                 <div slot="preTitleControls">
                   <BaseCheckbox
@@ -79,7 +80,8 @@ export default {
       groupShowIcon: ["fas", "caret-down"],
       groupHideIcon: ["fas", "caret-up"],
       nonzeroLabel: "Nonzero Only",
-      searchQuery: ""
+      searchQuery: "",
+      collapseAll: false
     }
   },
   computed: {
@@ -116,6 +118,7 @@ export default {
       //   selectedVariantId,
       //   collapseStats
       // })
+      this.collapseAll = collapseStats
     }
   }
 }

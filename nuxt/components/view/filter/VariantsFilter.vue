@@ -1,14 +1,19 @@
 <template>
   <div class="variants-filter">
-    <div class="second-header">
-      <VariantsFilterSecondHeader />
+    <div v-if="loadView" class="load-view">
+      <LoadView @close="loadView = false" />
     </div>
-    <div class="variants-filter-content">
-      <div class="stats-list-view default-scroll">
-        <StatsList />
+    <div v-else class="conditions-view">
+      <div class="second-header">
+        <VariantsFilterSecondHeader @showLoadView="loadView = true" />
       </div>
-      <div class="conditions-view default-scroll">
-        <ConditionsView />
+      <div class="variants-filter-content">
+        <div class="stats-list-view default-scroll">
+          <StatsList />
+        </div>
+        <div class="conditions-view default-scroll">
+          <ConditionsView />
+        </div>
       </div>
     </div>
   </div>
@@ -18,14 +23,32 @@
 import VariantsFilterSecondHeader from "~/components/view/filter/VariantsFilterSecondHeader.vue"
 import StatsList from "~/components/view/filter/stats/StatsList.vue"
 import ConditionsView from "~/components/view/filter/conditions/ConditionsView.vue"
+import LoadView from "~/components/view/filter/load-view/LoadView.vue"
 export default {
   name: "VariantsFilter",
-  components: { ConditionsView, StatsList, VariantsFilterSecondHeader }
+  components: {
+    LoadView,
+    ConditionsView,
+    StatsList,
+    VariantsFilterSecondHeader
+  },
+  data() {
+    return {
+      loadView: false,
+      advancedView: false
+    }
+  }
 }
 </script>
 
 <style lang="scss">
 .variants-filter {
+  height: 100%;
+}
+.load-view {
+  height: 100%;
+}
+.conditions-view {
   height: 100%;
   .second-header {
     width: 100%;

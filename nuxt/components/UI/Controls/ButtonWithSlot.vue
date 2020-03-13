@@ -8,7 +8,7 @@
       :value="slotVisible"
       :show-icon="showIcon"
       :hide-icon="hideIcon"
-      @change="slotVisible = !slotVisible"
+      @change="changeSlotVisible"
     />
     <div v-show="slotVisible" class="slot">
       <slot />
@@ -44,16 +44,33 @@ export default {
       default: () => {
         return ["fas", "times"]
       }
+    },
+    show: {
+      type: Boolean,
+      default: () => {
+        return false
+      }
     }
   },
   data() {
     return {
-      slotVisible: false
+      slotVisible: this.show
+    }
+  },
+  watch: {
+    show() {
+      this.slotVisible = this.show
+    },
+    slotVisible() {
+      this.$emit("changeSlotVisible", this.slotVisible)
     }
   },
   methods: {
     hideSlot() {
       this.slotVisible = false
+    },
+    changeSlotVisible() {
+      this.slotVisible = !this.slotVisible
     }
   }
 }

@@ -38,9 +38,6 @@ export default {
   computed: {
     isShowAllNotes() {
       return this.$store.getters.isShowAllNotes
-    },
-    getStickerColor() {
-      return this.isShowAllNotes ? "red-eye" : "green-eye"
     }
   },
   methods: {

@@ -5,8 +5,12 @@
       <ButtonWithSlot :show-icon="['fas', 'layer-group']">
         <ViewButtonsList />
       </ButtonWithSlot>
-      <ButtonWithSlot :show-icon="['fas', 'filter']">
-        <QuickFilterView />
+      <ButtonWithSlot
+        :show-icon="['fas', 'filter']"
+        :show="showQuickFilterView"
+        @changeSlotVisible="changeQuickFilterViewVisible"
+      >
+        <QuickFilterView @close="changeQuickFilterViewVisible(false)" />
       </ButtonWithSlot>
       <slot name="btns"></slot>
     </div>
@@ -24,6 +28,16 @@ export default {
     QuickFilterView,
     ViewButtonsList,
     ButtonWithSlot
+  },
+  data() {
+    return {
+      showQuickFilterView: false
+    }
+  },
+  methods: {
+    changeQuickFilterViewVisible(value) {
+      this.showQuickFilterView = value
+    }
   }
 }
 </script>

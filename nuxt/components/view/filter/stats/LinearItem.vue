@@ -116,7 +116,9 @@ export default {
       }
       return Array(5)
         .fill("")
-        .map((item, index) => this.min + ((this.max - this.min) * index) / 4)
+        .map((item, index) =>
+          this.round(this.min + ((this.max - this.min) * index) / 4)
+        )
     },
     sliderMarks() {
       if (this.isLogarithmic) {
@@ -169,9 +171,12 @@ export default {
     },
     roundLogarithmic(value) {
       if (this.isLogarithmic) {
-        return Math.round(value * 10000) / 10000
+        return this.round(value)
       }
       return value
+    },
+    round(value) {
+      return Math.round(value * 10000) / 10000
     },
     closestLeftMark(value) {
       const index = this.marks.findIndex(item => value < item)
