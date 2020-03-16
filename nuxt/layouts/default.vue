@@ -14,11 +14,16 @@
           <AppButton
             class="advanced-view-button"
             :btn-class="'btnDefaultOutline'"
+            @click="advancedView = true"
           >
             &lt;/&gt;
           </AppButton>
         </div>
-        <VariantsFilter slot="body" />
+        <VariantsFilter
+          slot="body"
+          :advanced-view="advancedView"
+          @close="advancedView = false"
+        />
       </BaseModal>
     </div>
   </v-app>
@@ -29,13 +34,18 @@ import Header from "~/components/system/header/Header.vue"
 import BaseModal from "~/components/UI/Modals/BaseModal.vue"
 import AppButton from "~/components/UI/Controls/Button.vue"
 import VariantsFilter from "~/components/view/filter/VariantsFilter"
-import { isEqual } from "~/assets/js/utils.js"
+import { NEW_FILTER_TITLE } from "~/assets/js/constants.js"
 
 export default {
   components: { Header, BaseModal, AppButton, VariantsFilter },
   // validate({ params, query, store }) {
   //   return store.getters.getWorkspaces.some(ws => ws.name === query.ws)
   // },
+  data() {
+    return {
+      advancedView: false
+    }
+  },
   computed: {
     showVariantsFilter: {
       get() {
@@ -46,19 +56,14 @@ export default {
       }
     },
     variantsFilterTitle() {
-      let title = "New Filter"
-      const selectedPreset = this.$store.getters.getSelectedPreset
       const conditions = this.$store.getters.getCurrentConditionsArray
       const loadedConditions = this.$store.getters.getLoadedConditions
-      if (selectedPreset.length > 0) {
-        title = selectedPreset
+
+      let title = this.$store.getters.getModalFilterTitle
+      if (!title) {
+        title = NEW_FILTER_TITLE
       }
-      if (
-        (loadedConditions &&
-          loadedConditions.length > 0 &&
-          !isEqual(conditions, loadedConditions())) ||
-        conditions.length > 0
-      ) {
+      if (!this._.isEqual(conditions, loadedConditions)) {
         title += " - Unsaved"
       }
       return title
@@ -86,6 +91,8 @@ export default {
         this.$store.dispatch("getFilters", ws)
         this.$store.dispatch("getZones", ws)
         this.$store.dispatch("getMeta", ws)
+        this.$store.dispatch("getRulesData", ws)
+        this.$store.commit("resetAllConditions")
         this.$store.commit("resetZones")
       }
     }

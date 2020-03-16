@@ -4,7 +4,8 @@ import {
   STAT_GROUP,
   STAT_TYPE_ENUM,
   STAT_TYPE_ZYGOSITY,
-  STAT_NUMERIC
+  STAT_NUMERIC,
+  UPDATE_FILTER_TYPE
 } from "../assets/js/constants.js"
 
 export const state = () => ({
@@ -22,14 +23,18 @@ export const state = () => ({
   meta: null,
   compiled: null,
   zones: [],
-  selectedPreset: [],
+  selectedPreset: "",
+  loadedPreset: "",
+  modalFilterTitle: "",
   presets: [],
   presetsLoading: false,
   stats: [],
   showVariantsFilter: false,
   currentConditions: [],
   loadedConditions: [],
-  nonzeroOnly: true
+  nonzeroOnly: true,
+  rulesData: [],
+  rulesParams: ""
 })
 
 export const mutations = {
@@ -109,10 +114,26 @@ export const mutations = {
     state.stats = stats
   },
   setSelectedPreset(state, selectedPreset) {
-    state.selectedPreset[0] = selectedPreset
+    state.selectedPreset = selectedPreset
+  },
+  setLoadedPreset(state, loadedPreset) {
+    state.loadedPreset = loadedPreset
+  },
+  setModalFilterTitle(state, title) {
+    state.modalFilterTitle = title
   },
   setPresets(state, presets) {
     state.presets = presets
+  },
+  addPreset(state, addedPreset) {
+    const addedPresetIndex = state.presets.findIndex(
+      preset => preset[0] === addedPreset[0]
+    )
+    if (addedPresetIndex !== -1) {
+      state.presets[addedPresetIndex] = addedPreset
+    } else {
+      state.presets.push(addedPreset)
+    }
   },
   setPresetsLoading(state, presetsLoading) {
     state.presetsLoading = presetsLoading
@@ -167,6 +188,20 @@ export const mutations = {
   setNonzeroOnly(state, nonzeroOnly) {
     state.nonzeroOnly = nonzeroOnly
   },
+  setRulesData(state, rulesData) {
+    state.rulesData = rulesData
+  },
+  setRulesParams(state, rulesParams) {
+    state.rulesParams = rulesParams
+  },
+  removePreset(state, presetName) {
+    const presetIndex = state.presets.findIndex(
+      preset => preset[0] === presetName
+    )
+    if (presetIndex !== -1) {
+      state.presets.splice(presetIndex, 1)
+    }
+  },
   removeConditionsByIndex(state, index) {
     state.currentConditions.splice(index, 1)
   },
@@ -192,7 +227,11 @@ export const mutations = {
     state.zones.forEach(zone => {
       return (zone.selectedValues = [])
     })
-    state.selectedPreset = []
+    state.selectedPreset = ""
+  },
+  resetAllConditions(state) {
+    state.currentConditions = []
+    state.loadedConditions = []
   },
   resetConditionsByName(state, name) {
     const index = state.currentConditions.findIndex(
@@ -257,7 +296,7 @@ export const actions = {
         commit("setTotalVariants", res.total)
         commit("setFilteredVariants", res.filtered)
         commit("setTranscripts", res.transcripts)
-        if (selectedPreset && selectedPreset.length > 0) {
+        if (selectedPreset) {
           commit("setSelectedPreset", selectedPreset)
         }
       })
@@ -359,10 +398,10 @@ export const actions = {
       })
   },
 
-  async getFilters({ commit }, selectedWorkspace) {
+  async getFilters({ commit }, ws) {
     commit("setPresetsLoading", true)
     const params = new URLSearchParams()
-    params.append("ws", selectedWorkspace)
+    params.append("ws", ws)
     const compiled = this.getters.getCompiled
     if (compiled) {
       params.append("compiled", JSON.stringify(compiled))
@@ -370,10 +409,15 @@ export const actions = {
     await this.$axios
       .$post("/stat", params)
       .then(response => {
-        const filterList = response["filter-list"]
-        if (filterList && Array.isArray(filterList)) {
-          commit("setPresets", [null, ...filterList])
-          commit("setPresetsLoading", false)
+        const presets = response["filter-list"]
+        if (presets && Array.isArray(presets)) {
+          presets.forEach(filter => {
+            this.dispatch("getConditionsByFilter", {
+              ws: ws,
+              filter: filter,
+              presetsLength: presets.length
+            })
+          })
         }
         const statList = utils.getStatListWithOperativeStat(response)
         commit("setStats", utils.prepareStatList(statList))
@@ -384,11 +428,10 @@ export const actions = {
       })
   },
 
-  async getConditionsByFilter({ commit }, { ws, filter }) {
-    commit("setPresetsLoading", true)
+  async getConditionsByFilter({ commit }, { ws, filter, presetsLength }) {
     const params = new URLSearchParams()
     params.append("ws", ws)
-    params.append("filter", filter)
+    params.append("filter", filter[0])
     const compiled = this.getters.getCompiled
     if (compiled) {
       params.append("compiled", JSON.stringify(compiled))
@@ -396,10 +439,56 @@ export const actions = {
     await this.$axios
       .$post("/stat", params)
       .then(response => {
-        commit("setPresetConditionsByName", {
-          filter: filter,
-          conditions: response.conditions
-        })
+        if (filter.length > 3) {
+          filter[4] = response.conditions
+        } else {
+          filter.push(response.conditions)
+        }
+        commit("addPreset", filter)
+        if (presetsLength) {
+          if (this.state.presets.length === presetsLength) {
+            commit("setPresetsLoading", false)
+          }
+        }
+      })
+      .catch(error => {
+        console.log(error)
+      })
+  },
+
+  async updateFilter({ commit }, { ws, filter, type }) {
+    const params = new URLSearchParams()
+    params.append("ws", ws)
+    params.append("instr", `${type}/${filter}`)
+    if (
+      type === UPDATE_FILTER_TYPE &&
+      this.state.currentConditions.length > 0
+    ) {
+      params.append("conditions", JSON.stringify(this.state.currentConditions))
+      const zygosity = this.state.currentConditions.find(
+        condition => condition[0] === STAT_TYPE_ZYGOSITY
+      )
+      const ctx = zygosity ? zygosity[2] : null
+      if (ctx) {
+        params.append("ctx", JSON.stringify(ctx))
+      }
+    }
+    const compiled = this.getters.getCompiled
+    if (compiled) {
+      params.append("compiled", JSON.stringify(compiled))
+    }
+    await this.$axios
+      .$post("/stat", params)
+      .then(response => {
+        if (type === UPDATE_FILTER_TYPE) {
+          const newPreset = response["filter-list"].find(f => f[0] === filter)
+          newPreset.push(this.state.currentConditions)
+          commit("addPreset", newPreset)
+          commit("setModalFilterTitle", filter)
+          commit("setLoadedConditions", this.state.currentConditions)
+        } else {
+          commit("removePreset", filter)
+        }
       })
       .catch(error => {
         console.log(error)
@@ -426,6 +515,33 @@ export const actions = {
       .catch(error => {
         console.log(error)
       })
+  },
+
+  async getRulesData({ commit }, ws) {
+    const params = new URLSearchParams()
+    params.append("ws", ws)
+    await this.$axios
+      .$post("/rules_data", params)
+      .then(response => {
+        commit("setRulesData", response.columns)
+        commit("setRulesParams", response.params)
+      })
+      .catch(error => {
+        commit("setRulesData", [])
+        commit("setRulesParams", "")
+        console.log(error)
+      })
+  },
+
+  async updateRules(context, payload) {
+    const params = new URLSearchParams()
+    params.append("ws", payload.ws)
+    params.append("it", payload.name)
+    params.append("cnt", payload.data)
+
+    await this.$axios.$post("/rules_modify", params).catch(error => {
+      console.log(error)
+    })
   },
 
   async updateZygosityByName({ commit }, { family, name }) {
@@ -547,6 +663,12 @@ export const getters = {
   getSelectedPreset(state) {
     return state.selectedPreset
   },
+  getLoadedPreset(state) {
+    return state.loadedPreset
+  },
+  getModalFilterTitle(state) {
+    return state.modalFilterTitle
+  },
   getPresets(state) {
     return state.presets
   },
@@ -555,19 +677,25 @@ export const getters = {
   },
   getPresetByName(state) {
     return name => {
-      const presets = state.presets.slice(1)
+      if (!name) {
+        return null
+      }
+      const presets = state.presets
       const findedPreset = presets.find(preset => {
         if (preset) {
           return preset[0] === name
         }
         return false
       })
-      return {
-        name: findedPreset[0],
-        isCommon: findedPreset[1],
-        date: findedPreset[3],
-        conditions: findedPreset[4]
+      if (findedPreset) {
+        return {
+          name: findedPreset[0],
+          isCommon: findedPreset[1],
+          date: findedPreset[3],
+          conditions: findedPreset[4]
+        }
       }
+      return null
     }
   },
   getShowVariantsFilter(state) {
@@ -636,5 +764,11 @@ export const getters = {
   },
   getNonzeroOnly(state) {
     return state.nonzeroOnly
+  },
+  getRulesData(state) {
+    return state.rulesData
+  },
+  getRulesParams(state) {
+    return state.rulesParams
   }
 }

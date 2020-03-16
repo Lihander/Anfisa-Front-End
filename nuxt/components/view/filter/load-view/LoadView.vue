@@ -1,9 +1,13 @@
 <template>
   <div class="load-view">
-    <LoadToolbar @close="$emit('close')" />
-    <div class="load-filters-list">
+    <LoadToolbar @close="close" />
+    <div class="load-filters-list default-scroll">
       <div v-for="(preset, index) in presets" :key="index">
-        <LoadViewCard class="load-filter" :filter="filter(preset)" />
+        <LoadViewCard
+          class="load-filter"
+          :filter="filter(preset)"
+          @close="close"
+        />
       </div>
     </div>
   </div>
@@ -34,20 +38,11 @@ export default {
       }
     }
   },
-  created() {
-    const presets = this.$store.getters.getPresets
-    presets.forEach(preset => {
-      if (!preset) {
-        return
-      }
-      this.$store.dispatch("getConditionsByFilter", {
-        ws: this.$store.getters.getSelectedWorkspace,
-        filter: preset[0]
-      })
-    })
-  },
   methods: {
-    sortBy() {}
+    sortBy() {},
+    close() {
+      this.$emit("close")
+    }
   }
 }
 </script>

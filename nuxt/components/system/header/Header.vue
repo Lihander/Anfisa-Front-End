@@ -41,6 +41,7 @@
     </div>
     <BaseModal
       v-show="showWorkspaces"
+      class="workspaces-modal"
       :title="title"
       @close="showWorkspaces = false"
     >
@@ -201,6 +202,11 @@ header {
   }
   .btnPrimary {
     width: 20%;
+  }
+}
+.workspaces-modal {
+  .modal-content {
+    width: 30vw !important;
   }
 }
 </style>

@@ -77,6 +77,8 @@ export default {
 }
 
 .modal-content {
+  display: flex;
+  flex-flow: column;
   position: relative;
   max-width: 80vw;
   height: 75vh;
@@ -90,7 +92,9 @@ export default {
   }
 }
 .modal-header {
+  flex: 0 1 auto;
   height: 10%;
+  width: 100%;
   display: flex;
   align-self: center;
   justify-content: space-between;
@@ -123,11 +127,13 @@ export default {
   }
 }
 .modal-body {
-  height: 80%;
+  flex: 1 1 auto;
+  min-height: 80%;
   text-align: center;
 }
 
 .modal-footer {
+  flex: 0 1 40px;
   height: 10%;
   text-align: right;
   padding: 10px 25px;

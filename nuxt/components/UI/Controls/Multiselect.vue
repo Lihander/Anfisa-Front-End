@@ -44,8 +44,15 @@ export default {
     "$route.query.ws"() {
       this.selected = []
     },
+    selectedValues(values) {
+      if (this.selected !== values) {
+        this.selected = values
+      }
+    },
     selected(values) {
-      this.$emit("onChange", values)
+      if (this.selectedValues !== values) {
+        this.$emit("onChange", values)
+      }
     }
   }
 }

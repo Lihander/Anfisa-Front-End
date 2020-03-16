@@ -32,6 +32,10 @@ export const STAT_NUMERIC = "numeric"
 
 export const VARIANTS_FILTER_TITLE = "FILTER VARIANTS"
 
+export const NEW_FILTER_TITLE = "New Filter"
+export const DELETE_FILTER_TYPE = "DELETE"
+export const UPDATE_FILTER_TYPE = "UPDATE"
+
 export const LOG_EDITOR_MARKS = [0, 0.0001, 0.001, 0.01, 0.05, 0.5, 1]
 
 export const RENDER_OPERATIVE = "operative"

@@ -42,7 +42,7 @@
 </template>
 
 <script>
-import { STAT_NUMERIC } from "~/assets/js/constants.js"
+import { STAT_NUMERIC, DELETE_FILTER_TYPE } from "~/assets/js/constants.js"
 import AppButton from "~/components/UI/Controls/Button.vue"
 import NumericView from "~/components/view/filter/conditions/NumericView.vue"
 import LoadViewCardContent from "./LoadViewCardContent"
@@ -70,8 +70,23 @@ export default {
     }
   },
   methods: {
-    loadFilter() {},
-    removeFilter() {}
+    loadFilter() {
+      this.$store.commit("setModalFilterTitle", this.filter.name)
+      this.$store.commit("setLoadedPreset", this.filter.name)
+      this.$store.commit(
+        "setLoadedConditions",
+        JSON.parse(JSON.stringify(this.filter.conditions))
+      )
+      this.$store.commit("setAllCurrentConditions", this.filter.conditions)
+      this.$emit("close")
+    },
+    removeFilter() {
+      this.$store.dispatch("updateFilter", {
+        ws: this.$store.getters.getSelectedWorkspace,
+        filter: this.filter.name,
+        type: DELETE_FILTER_TYPE
+      })
+    }
   }
 }
 </script>

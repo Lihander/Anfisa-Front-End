@@ -42,7 +42,8 @@ export default {
     "~/plugins/vuetify",
     "~/plugins/axios",
     "~/plugins/directives",
-    "~/plugins/vue-slider"
+    "~/plugins/vue-slider",
+    "~/plugins/lodash"
   ],
   /*
    ** Nuxt.js dev-modules

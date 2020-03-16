@@ -3,6 +3,9 @@
     <div v-if="loadView" class="load-view">
       <LoadView @close="loadView = false" />
     </div>
+    <div v-else-if="advancedView" class="advanced-view">
+      <AdvancedView @close="$emit('close')" />
+    </div>
     <div v-else class="conditions-view">
       <div class="second-header">
         <VariantsFilterSecondHeader @showLoadView="loadView = true" />
@@ -24,18 +27,25 @@ import VariantsFilterSecondHeader from "~/components/view/filter/VariantsFilterS
 import StatsList from "~/components/view/filter/stats/StatsList.vue"
 import ConditionsView from "~/components/view/filter/conditions/ConditionsView.vue"
 import LoadView from "~/components/view/filter/load-view/LoadView.vue"
+import AdvancedView from "~/components/view/filter/advanced-view/AdvancedView.vue"
 export default {
   name: "VariantsFilter",
   components: {
+    AdvancedView,
     LoadView,
     ConditionsView,
     StatsList,
     VariantsFilterSecondHeader
   },
+  props: {
+    advancedView: {
+      type: Boolean,
+      required: true
+    }
+  },
   data() {
     return {
-      loadView: false,
-      advancedView: false
+      loadView: false
     }
   }
 }
@@ -46,6 +56,9 @@ export default {
   height: 100%;
 }
 .load-view {
+  height: 100%;
+}
+.advanced-view {
   height: 100%;
 }
 .conditions-view {

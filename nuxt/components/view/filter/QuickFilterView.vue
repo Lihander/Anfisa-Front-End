@@ -84,7 +84,11 @@ export default {
       return this.$store.getters.getPresetsLoading
     },
     selectedPreset() {
-      return this.$store.getters.getSelectedPreset
+      const selectedPreset = this.$store.getters.getSelectedPreset
+      if (selectedPreset) {
+        return [selectedPreset]
+      }
+      return []
     },
     zones() {
       return this.$store.getters.getZones
@@ -98,21 +102,37 @@ export default {
       return "Select " + name
     },
     presetChanged(newPreset) {
-      this.$store.commit("setSelectedPreset", newPreset)
-      this.$store.dispatch("getWorkspaceDetails", {
-        ws: this.$store.getters.getSelectedWorkspace,
-        selectedPreset: newPreset,
-        zones: this.$store.getters.getZones
-      })
+      const selectedPreset = this.$store.getters.getSelectedPreset
+      const presetFromStore = this.$store.getters.getPresetByName(newPreset)
+      if (selectedPreset !== newPreset) {
+        this.$store.commit("setModalFilterTitle", newPreset)
+        this.$store.commit("setSelectedPreset", newPreset)
+        if (presetFromStore) {
+          this.$store.commit(
+            "setAllCurrentConditions",
+            presetFromStore.conditions
+          )
+        } else {
+          this.$store.commit("setAllCurrentConditions", [])
+        }
+        this.$store.commit("setLoadedConditions", [])
+        this.$store.dispatch("getWorkspaceDetails", {
+          ws: this.$store.getters.getSelectedWorkspace,
+          selectedPreset: newPreset,
+          zones: this.$store.getters.getZones
+        })
+      }
     },
     zoneChanged(zone, values) {
-      zone.selectedValues = values
-      this.$store.commit("setZone", zone)
-      this.$store.dispatch("getWorkspaceDetails", {
-        ws: this.$store.getters.getSelectedWorkspace,
-        selectedPreset: this.$store.getters.getSelectedPreset,
-        zones: this.$store.getters.getZones
-      })
+      if (zone.selectedValues !== values) {
+        zone.selectedValues = values
+        this.$store.commit("setZone", zone)
+        this.$store.dispatch("getWorkspaceDetails", {
+          ws: this.$store.getters.getSelectedWorkspace,
+          selectedPreset: this.$store.getters.getSelectedPreset,
+          zones: this.$store.getters.getZones
+        })
+      }
     }
   }
 }

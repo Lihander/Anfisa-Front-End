@@ -30,20 +30,19 @@
       </div>
     </div>
     <div class="save-load-btns">
-      <AppButton
-        class="second-header-button"
-        :btn-class="'btnSuccess'"
-        :disabled="activeFilters === 0"
-      >
-        <font-awesome-icon :icon="['fas', 'save']" />
-        <span>Save</span>
-      </AppButton>
+      <SaveLine
+        v-model="filterName"
+        class="filter-save-line"
+        :disabled="canSave"
+        placeholder="Enter filter name"
+        @save="saveFilter"
+      />
       <AppButton
         class="second-header-button"
         :btn-class="'btnAccent'"
         @click="$emit('showLoadView')"
       >
-        <font-awesome-icon :icon="['fas', 'folder']" />
+        <font-awesome-icon :icon="['fas', 'upload']" />
         <span>Load</span>
       </AppButton>
     </div>
@@ -51,10 +50,17 @@
 </template>
 
 <script>
+import { UPDATE_FILTER_TYPE } from "~/assets/js/constants.js"
 import AppButton from "~/components/UI/Controls/Button.vue"
+import SaveLine from "~/components/UI/Controls/SaveLine.vue"
 export default {
   name: "VariantsFilterSecondHeader",
-  components: { AppButton },
+  components: { SaveLine, AppButton },
+  data() {
+    return {
+      filterName: this.$store.getters.getModalFilterTitle
+    }
+  },
   computed: {
     activeFilters() {
       return this.$store.getters.getCurrentConditionsArray.length
@@ -64,19 +70,41 @@ export default {
         return "Active Filters"
       }
       return "Active Filter"
+    },
+    canSave() {
+      const conditions = this.$store.getters.getCurrentConditionsArray
+      const loadedConditions = this.$store.getters.getLoadedConditions
+
+      const isFilterChanged = !this._.isEqual(conditions, loadedConditions)
+      if (!loadedConditions) {
+        return !isFilterChanged
+      } else {
+        return !isFilterChanged && !this.activeFilters > 0
+      }
     }
   },
   methods: {
     clearAllConditions() {
       this.$store.commit("setAllCurrentConditions", [])
     },
+    saveFilter() {
+      if (this.filterName) {
+        this.$store.dispatch("updateFilter", {
+          ws: this.$store.getters.getSelectedWorkspace,
+          filter: this.filterName,
+          type: UPDATE_FILTER_TYPE
+        })
+      }
+    },
     applyConditions() {
+      const loadedPreset = this.$store.getters.getLoadedPreset
       this.$store.dispatch("getWorkspaceDetails", {
         ws: this.$store.getters.getSelectedWorkspace,
-        selectedPreset: this.$store.getters.getSelectedPreset,
+        selectedPreset: loadedPreset,
         zones: this.$store.getters.getZones,
         conditions: this.$store.getters.getCurrentConditionsArray
       })
+      this.$store.commit("setSelectedPreset", loadedPreset)
       this.$store.commit("setShowVariantsFilter", false)
     }
   }
@@ -130,6 +158,10 @@ export default {
     justify-content: flex-end;
     align-items: center;
     margin: 0 20px;
+  }
+  .filter-save-line {
+    overflow: hidden;
+    border-radius: 20px;
   }
   .second-header-button {
     width: 150px;
